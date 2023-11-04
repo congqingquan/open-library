@@ -22,10 +22,13 @@ public class Constants {
     public static final String HH = "HH";
     public static final String mm = "mm";
     public static final String ss = "ss";
+    public static final String SSS = "SSS";
+    public static final String HH_mm_ss = HH + ":" + mm + ":" + ss;
     public static final String yyyy_MM_dd = yyyy + "-" + MM + "-" + dd;
     public static final String yyyy_MM_dd_HH = yyyy_MM_dd + " " + HH;
     public static final String yyyy_MM_dd_HH_mm = yyyy_MM_dd_HH + ":" + mm;
     public static final String yyyy_MM_dd_HH_mm_ss = yyyy_MM_dd_HH_mm + ":" + ss;
+    public static final String yyyy_MM_dd_HH_mm_ss_SSS = yyyy_MM_dd_HH_mm_ss + ":" + SSS;
 
     /**
      * 逗号
@@ -47,7 +50,7 @@ public class Constants {
     /**
      * 未删除
      */
-    public static final int NOT_DELETED = 0;
+    public static final int NO_DELETED = 0;
     
     /**
      * 已删除
