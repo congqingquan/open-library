@@ -45,10 +45,8 @@ public class StringUtils {
         int midEndIndex = midStartIndex + length - 1;
 
         char[] chars = str.toCharArray();
-        for (int i = 0; i < chars.length; i++) {
-            if (i >= midStartIndex && i <= midEndIndex) {
-                chars[i] = replaceChar;
-            }
+        for (int i = midStartIndex; i <= midEndIndex; i++) {
+            chars[i] = replaceChar;
         }
         return new String(chars);
     }
@@ -76,4 +74,5 @@ public class StringUtils {
         }
         return result;
     }
+
 }
