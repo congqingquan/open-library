@@ -6,6 +6,7 @@ import io.jsonwebtoken.Header;
 import io.jsonwebtoken.Jwt;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.vavr.Tuple2;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.cqq.openlibrary.core.annotation.Nullable;
@@ -81,14 +82,40 @@ public class JWSUtils {
      * @return
      */
     public static Jwt<Header<?>, Claims> parse(String token,
-                                            SignatureAlgorithm signatureAlgorithm,
-                                            String secretKey,
-                                            long allowedClockSkewSeconds) {
+                                               SignatureAlgorithm signatureAlgorithm,
+                                               String secretKey,
+                                               long allowedClockSkewSeconds) {
         return Jwts.parserBuilder()
                 .setSigningKey(new SecretKeySpec(secretKey.getBytes(), signatureAlgorithm.getJcaName()))
                 .setAllowedClockSkewSeconds(allowedClockSkewSeconds)
                 .build()
                 .parse(token);
+    }
+
+    /**
+     * Parse token and get token status
+     *
+     * @param token                   需要解析的 token
+     * @param signatureAlgorithm      签名算法
+     * @param secretKey               签名密匙
+     * @param allowedClockSkewSeconds 允许偏差的时间戳
+     * @return
+     */
+    public static Tuple2<JWSTokenStatus, Jwt<Header<?>, Claims>> parseAndGetTokenStatus(String token,
+                                                                                        SignatureAlgorithm signatureAlgorithm,
+                                                                                        String secretKey,
+                                                                                        long allowedClockSkewSeconds) {
+        Jwt<Header<?>, Claims> parse = null;
+        JWSTokenStatus tokenStatus;
+        try {
+            parse = parse(token, signatureAlgorithm, secretKey, allowedClockSkewSeconds);
+            tokenStatus = JWSTokenStatus.VALID;
+        } catch (ExpiredJwtException exception) {
+            tokenStatus = JWSTokenStatus.EXPIRED;
+        } catch (Exception exception) {
+            tokenStatus = JWSTokenStatus.INVALID;
+        }
+        return new Tuple2<>(tokenStatus, parse);
     }
 
     /**
