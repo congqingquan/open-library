@@ -26,7 +26,7 @@ public class JWSUtils {
 
     @Getter
     @AllArgsConstructor
-    public enum JWSTokenStatus {
+    public enum TokenStatus {
 
         /**
          * 有效：成功解析
@@ -101,19 +101,19 @@ public class JWSUtils {
      * @param allowedClockSkewSeconds 允许偏差的时间戳
      * @return
      */
-    public static Tuple2<JWSTokenStatus, Jwt<Header<?>, Claims>> parseAndGetTokenStatus(String token,
+    public static Tuple2<TokenStatus, Jwt<Header<?>, Claims>> parseAndGetTokenStatus(String token,
                                                                                         SignatureAlgorithm signatureAlgorithm,
                                                                                         String secretKey,
                                                                                         long allowedClockSkewSeconds) {
         Jwt<Header<?>, Claims> parse = null;
-        JWSTokenStatus tokenStatus;
+        TokenStatus tokenStatus;
         try {
             parse = parse(token, signatureAlgorithm, secretKey, allowedClockSkewSeconds);
-            tokenStatus = JWSTokenStatus.VALID;
+            tokenStatus = TokenStatus.VALID;
         } catch (ExpiredJwtException exception) {
-            tokenStatus = JWSTokenStatus.EXPIRED;
+            tokenStatus = TokenStatus.EXPIRED;
         } catch (Exception exception) {
-            tokenStatus = JWSTokenStatus.INVALID;
+            tokenStatus = TokenStatus.INVALID;
         }
         return new Tuple2<>(tokenStatus, parse);
     }
@@ -126,15 +126,15 @@ public class JWSUtils {
      * @param secretKey          签名密匙
      * @return
      */
-    public static JWSTokenStatus getTokenStatus(String token, SignatureAlgorithm signatureAlgorithm, String secretKey) {
+    public static TokenStatus getTokenStatus(String token, SignatureAlgorithm signatureAlgorithm, String secretKey) {
         try {
             parse(token, signatureAlgorithm, secretKey, 0L);
         } catch (ExpiredJwtException exception) {
-            return JWSTokenStatus.EXPIRED;
+            return TokenStatus.EXPIRED;
         } catch (Exception exception) {
-            return JWSTokenStatus.INVALID;
+            return TokenStatus.INVALID;
         }
-        return JWSTokenStatus.VALID;
+        return TokenStatus.VALID;
     }
 
     /**
@@ -145,7 +145,7 @@ public class JWSUtils {
      * @param secretKey          签名密匙
      */
     public static boolean valid(String token, SignatureAlgorithm signatureAlgorithm, String secretKey) {
-        return getTokenStatus(token, signatureAlgorithm, secretKey) == JWSTokenStatus.VALID;
+        return getTokenStatus(token, signatureAlgorithm, secretKey) == TokenStatus.VALID;
     }
 
     /**
