@@ -14,6 +14,8 @@ import org.cqq.oplibrary.web.entity.ROption;
 public enum WebServerROption implements ROption {
 
     SUCCESS(200, "成功"),
+    UNAUTHENTICATED(401, "未认证"),
+    UNAUTHORIZED(403, "未授权"),
     SERVER_INNER_EXCEPTION(500, "服务内部异常"),
     BUSINESS_EXCEPTION(600, "业务异常"),
     VALIDATED_EXCEPTION(700, "参数验证异常");

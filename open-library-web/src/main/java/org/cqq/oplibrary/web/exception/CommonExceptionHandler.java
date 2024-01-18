@@ -50,7 +50,21 @@ public class CommonExceptionHandler {
         );
         return builder.substring(0, builder.length() - 2);
     }
-    
+
+    @ExceptionHandler(UnauthenticatedException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public R<?> handleUnauthenticatedException(HttpServletRequest request, UnauthenticatedException exception) {
+        log.error(getBaseMessage(request, WebServerROption.UNAUTHENTICATED), exception);
+        return new R<>(WebServerROption.UNAUTHENTICATED.getCode(), null, exception.getMessage());
+    }
+
+    @ExceptionHandler(UnauthorizedException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public R<?> handleUnauthorizedException(HttpServletRequest request, UnauthenticatedException exception) {
+        log.error(getBaseMessage(request, WebServerROption.UNAUTHORIZED), exception);
+        return new R<>(WebServerROption.UNAUTHORIZED);
+    }
+
     @ExceptionHandler(BusinessException.class)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
