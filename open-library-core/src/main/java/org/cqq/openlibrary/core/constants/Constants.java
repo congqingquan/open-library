@@ -50,7 +50,7 @@ public class Constants {
     /**
      * 未删除
      */
-    public static final int NO_DELETED = 0;
+    public static final int NOT_DELETED = 0;
     
     /**
      * 已删除
