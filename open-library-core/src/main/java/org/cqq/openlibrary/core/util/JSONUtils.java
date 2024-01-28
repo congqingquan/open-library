@@ -1,6 +1,7 @@
 package org.cqq.openlibrary.core.util;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import org.cqq.openlibrary.core.constants.Constants;
@@ -28,12 +29,15 @@ public class JSONUtils {
         mapper = new ObjectMapper();
         mapper.findAndRegisterModules()
                 .setTimeZone(SimpleTimeZone.getTimeZone(Constants.TIME_ZONE_GMT_8))
+                .setDateFormat(new SimpleDateFormat(Constants.yyyy_MM_dd_HH_mm_ss))
+                // serialization
                 .configure(SerializationFeature.WRITE_DATES_WITH_ZONE_ID, false)
                 .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
                 .configure(SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS, false)
                 .configure(SerializationFeature.FAIL_ON_UNWRAPPED_TYPE_IDENTIFIERS, false)
                 .configure(SerializationFeature.WRITE_ENUMS_USING_TO_STRING, true)
-                .setDateFormat(new SimpleDateFormat(Constants.yyyy_MM_dd_HH_mm_ss));
+                // deserialization
+                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
     private static <R> R callMapper(CheckedFunction<ObjectMapper, R> function) {
