@@ -13,13 +13,13 @@ import java.util.Collections;
  * @author Qingquan.Cong
  */
 public class CodeUtils {
-
+    
     // ========================================================= Static =========================================================
-
+    
     public static final Integer MAX_PER_SECOND = 9999;
-
+    
     private static final DateTimeFormatter GEN_CODE_SEQUENCE_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
-
+    
     /**
      * if redis.call('hsetnx', KEYS[1], 'count', 1) == 1
      * then
@@ -36,29 +36,29 @@ public class CodeUtils {
                     "else local count = tonumber(redis.call('hget', KEYS[1], 'count')); redis.call('hmset', KEYS[1], 'count', count + 1); " +
                     "return count + 1; " +
                     "end";
-
+    
     // ========================================================= Member =========================================================
-
+    
     private final RedissonClient redissonClient;
-
-    private final String codeSequenceKey;
-
+    
+    private final String codeSequenceKeyPrefix;
+    
     public CodeUtils(RedissonClient redissonClient) {
         this(redissonClient, "GEN_CODE_SEQUENCE");
     }
-
-    public CodeUtils(RedissonClient redissonClient, String codeSequenceKey) {
+    
+    public CodeUtils(RedissonClient redissonClient, String codeSequenceKeyPrefix) {
         this.redissonClient = redissonClient;
-        this.codeSequenceKey = codeSequenceKey;
+        this.codeSequenceKeyPrefix = codeSequenceKeyPrefix;
     }
-
+    
     public String generate(String type) {
         String dateTimeNow = GEN_CODE_SEQUENCE_FORMATTER.format(LocalDateTime.now());
         RScript script = redissonClient.getScript();
         Long count = script.eval(
                 RScript.Mode.READ_WRITE, GEN_CODE_SEQUENCE_LUA,
                 RScript.ReturnType.INTEGER,
-                Collections.singletonList(codeSequenceKey),
+                Collections.singletonList(String.join("_", codeSequenceKeyPrefix, dateTimeNow)),
                 1
         );
         if (count > MAX_PER_SECOND) {
