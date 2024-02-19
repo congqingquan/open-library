@@ -6,6 +6,12 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 
 /**
  * HTTP request context
@@ -13,37 +19,84 @@ import javax.servlet.http.HttpServletResponse;
  * @author CongQingquan
  */
 public class HttpContext {
-
+    
     /**
      * Get req instance
      */
     public static HttpServletRequest getRequest() {
         return getServletRequestAttributes().getRequest();
     }
-
+    
     /**
      * Get response instance
-     *
-     * @return
      */
     public static HttpServletResponse getResponse() {
         return getServletRequestAttributes().getResponse();
     }
-
+    
     /**
      * Get servlet req attributes
-     *
-     * @return
      */
     public static ServletRequestAttributes getServletRequestAttributes() {
         return (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
     }
-
+    
+    /**
+     * Get header names
+     */
+    public static List<String> getHeadNames() {
+        Enumeration<String> headerNames = getRequest().getHeaderNames();
+        List<String> resultList = new ArrayList<>();
+        while (headerNames.hasMoreElements()) {
+            resultList.add(headerNames.nextElement());
+        }
+        return resultList;
+    }
+    
+    /**
+     * Get value of all header
+     */
+    public static Map<String, String> getAllHeader() {
+        Map<String, String> resultMap = new HashMap<>();
+        HttpServletRequest request = getRequest();
+        Enumeration<String> headerNames = request.getHeaderNames();
+        while (headerNames.hasMoreElements()) {
+            String headerName = headerNames.nextElement();
+            resultMap.put(headerName, request.getHeader(headerName));
+        }
+        return resultMap;
+    }
+    
+    
+    /**
+     * Get multiple value of header
+     */
+    public static <T> List<T> getHeaders(String name, Function<String, T> mapping) {
+        Enumeration<String> headers = getRequest().getHeaders(name);
+        List<T> values = new ArrayList<>();
+        while (headers.hasMoreElements()) {
+            values.add(mapping.apply(headers.nextElement()));
+        }
+        return values;
+    }
+    
+    /**
+     * Get multiple value of all header
+     */
+    public static Map<String, List<String>> getAllHeaders() {
+        Map<String, List<String>> resultMap = new HashMap<>();
+        HttpServletRequest request = HttpContext.getRequest();
+        Enumeration<String> headerNames = request.getHeaderNames();
+        while (headerNames.hasMoreElements()) {
+            String headerName = headerNames.nextElement();
+            List<String> values = getHeaders(headerName, Function.identity());
+            resultMap.put(headerName, values);
+        }
+        return resultMap;
+    }
+    
     /**
      * Get cookie
-     *
-     * @param matchName cookie name
-     * @return
      */
     public static Cookie getCookie(String matchName) {
         Cookie[] cookies = getRequest().getCookies();
@@ -54,11 +107,9 @@ public class HttpContext {
         }
         return null;
     }
-
+    
     /**
      * Get req domain
-     *
-     * @return
      */
     public static String getRequestDomain() {
         HttpServletRequest request = getRequest();
