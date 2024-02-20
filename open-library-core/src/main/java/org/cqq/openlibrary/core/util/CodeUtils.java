@@ -8,7 +8,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 
 /**
- * Code utils (每秒最多9999单, 规则: "业务编码[1]yyyyMMddHHmmss[14]订单数[4]")
+ * Code utils (每秒最多9999单, 规则: "业务编码[n]yyyyMMddHHmmss[14]订单数[4]")
  *
  * @author Qingquan.Cong
  */
