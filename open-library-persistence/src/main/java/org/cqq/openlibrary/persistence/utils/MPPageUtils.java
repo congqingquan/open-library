@@ -2,7 +2,7 @@ package org.cqq.openlibrary.persistence.utils;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.cqq.openlibrary.core.util.BeanUtils;
+import org.cqq.openlibrary.common.util.BeanUtils;
 
 import java.util.List;
 import java.util.function.Supplier;

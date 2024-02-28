@@ -10,10 +10,9 @@
     <name>open-library</name>
 
     <modules>
-        <module>open-library-core</module>
+        <module>open-library-common</module>
         <module>open-library-web</module>
         <module>open-library-persistence</module>
-        <module>open-library-spring</module>
     </modules>
 
     <properties>
@@ -21,6 +20,7 @@
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <spring-boot.version>2.6.5</spring-boot.version>
     </properties>
 
 
@@ -29,10 +29,19 @@
             <!-- modules -->
             <dependency>
                 <groupId>org.cqq</groupId>
-                <artifactId>open-library-core</artifactId>
+                <artifactId>open-library-common</artifactId>
                 <version>1.0-SNAPSHOT</version>
             </dependency>
-
+            
+            <!-- springboot -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-parent</artifactId>
+                <version>${spring-boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            
             <!-- web -->
             <dependency>
                 <groupId>javax.servlet</groupId>
@@ -41,33 +50,9 @@
                 <version>4.0.1</version>
             </dependency>
             <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-webmvc</artifactId>
-                <version>5.3.17</version>
-            </dependency>
-            <dependency>
                 <groupId>javax.validation</groupId>
                 <artifactId>validation-api</artifactId>
                 <version>2.0.1.Final</version>
-            </dependency>
-
-            <!-- springboot -->
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-json</artifactId>
-                <version>2.6.5</version>
-            </dependency>
-            
-            <!-- spring -->
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-tx</artifactId>
-                <version>5.3.10</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-context</artifactId>
-                <version>5.3.17</version>
             </dependency>
     
             <!-- redis -->
@@ -82,13 +67,6 @@
                 <groupId>com.baomidou</groupId>
                 <artifactId>mybatis-plus</artifactId>
                 <version>3.2.0</version>
-            </dependency>
-            
-            <!-- json -->
-            <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-databind</artifactId>
-                <version>2.12.3</version>
             </dependency>
     
             <!-- JWT -->

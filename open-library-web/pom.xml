@@ -16,7 +16,7 @@
         <!-- module -->
         <dependency>
             <groupId>org.cqq</groupId>
-            <artifactId>open-library-core</artifactId>
+            <artifactId>open-library-common</artifactId>
         </dependency>
         
         <!-- web -->
@@ -34,38 +34,16 @@
             <artifactId>validation-api</artifactId>
         </dependency>
     
-        <!-- springboot -->
+        <!-- spring -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-json</artifactId>
-        </dependency>
-        
-        <!-- JWT -->
-        <dependency>
-            <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt-impl</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt-jackson</artifactId>
-            <scope>runtime</scope>
         </dependency>
         
         <!-- log -->
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-        </dependency>
-    
-        <!-- vavr -->
-        <dependency>
-            <groupId>io.vavr</groupId>
-            <artifactId>vavr</artifactId>
         </dependency>
         
         <!-- lombok -->

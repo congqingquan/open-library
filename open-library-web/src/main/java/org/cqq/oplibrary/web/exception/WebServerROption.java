@@ -2,7 +2,7 @@ package org.cqq.oplibrary.web.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.cqq.oplibrary.web.entity.ROption;
+import org.cqq.openlibrary.common.domain.ROption;
 
 /**
  * Web server response option

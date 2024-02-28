@@ -16,7 +16,7 @@
         <!-- module -->
         <dependency>
             <groupId>org.cqq</groupId>
-            <artifactId>open-library-core</artifactId>
+            <artifactId>open-library-common</artifactId>
         </dependency>
         
         <!-- spring tx -->

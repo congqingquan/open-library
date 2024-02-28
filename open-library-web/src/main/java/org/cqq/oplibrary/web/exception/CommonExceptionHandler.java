@@ -1,8 +1,8 @@
 package org.cqq.oplibrary.web.exception;
 
 import lombok.extern.slf4j.Slf4j;
-import org.cqq.oplibrary.web.entity.R;
-import org.cqq.oplibrary.web.entity.ROption;
+import org.cqq.openlibrary.common.domain.R;
+import org.cqq.openlibrary.common.domain.ROption;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;

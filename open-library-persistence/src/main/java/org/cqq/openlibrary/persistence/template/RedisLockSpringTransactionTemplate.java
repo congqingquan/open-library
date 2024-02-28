@@ -1,7 +1,8 @@
 package org.cqq.openlibrary.persistence.template;
 
 import lombok.AllArgsConstructor;
-import org.cqq.openlibrary.core.func.ThrowableExecution;
+import org.cqq.openlibrary.common.component.template.RedisLockTemplate;
+import org.cqq.openlibrary.common.func.ThrowableExecution;
 import org.springframework.transaction.TransactionDefinition;
 
 import java.util.Arrays;

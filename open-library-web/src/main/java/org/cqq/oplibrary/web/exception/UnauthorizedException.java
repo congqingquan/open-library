@@ -1,10 +1,9 @@
 package org.cqq.oplibrary.web.exception;
 
 /**
- * Created by Kim QQ.Cong on 2022/12/31 / 19:19
+ * 未授权异常
  *
- * @author: CongQingquan
- * @Description: 未授权异常
+ * @author Qingquan.Cong
  */
 public class UnauthorizedException extends RuntimeException {
     

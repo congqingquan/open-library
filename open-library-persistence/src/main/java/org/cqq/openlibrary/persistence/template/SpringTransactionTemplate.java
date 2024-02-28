@@ -1,7 +1,7 @@
 package org.cqq.openlibrary.persistence.template;
 
 import lombok.AllArgsConstructor;
-import org.cqq.openlibrary.core.func.ThrowableExecution;
+import org.cqq.openlibrary.common.func.ThrowableExecution;
 import org.cqq.openlibrary.persistence.transaction.SpringTransactionHelper;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
