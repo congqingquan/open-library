@@ -21,41 +21,45 @@ public class SpringTransactionTemplate {
 
     private final SpringTransactionHelper springTransactionHelper;
 
-    public final <X extends Throwable> void requiredExecute(Collection<Class<? extends Throwable>> rollbackFor,
-                                                                                     ThrowableExecution<X> task) throws X {
+    public final <R, X extends Throwable> void requiredExecute(Collection<Class<? extends Throwable>> rollbackFor,
+                                                               ThrowableExecution<R, X> task) throws X {
         execute(TransactionDefinition.ISOLATION_REPEATABLE_READ, TransactionDefinition.PROPAGATION_REQUIRED, rollbackFor, task);
     }
 
-    public final <X extends Throwable> void requiresNewExecute(Collection<Class<? extends Throwable>> rollbackFor,
-                                                                        ThrowableExecution<X> task) throws X {
+    public final <R, X extends Throwable> void requiresNewExecute(Collection<Class<? extends Throwable>> rollbackFor,
+                                                                  ThrowableExecution<R, X> task) throws X {
         execute(TransactionDefinition.ISOLATION_REPEATABLE_READ, TransactionDefinition.PROPAGATION_REQUIRES_NEW, rollbackFor, task);
     }
 
     /**
      * 执行
-     * @param isolationLevel 事务隔离级别
+     *
+     * @param isolationLevel      事务隔离级别
      * @param propagationBehavior 事务传播行为
-     * @param rollbackFor 支持回滚的异常, 默认支持 {RuntimeException.class, Error.class}
-     * @param task 执行体
+     * @param rollbackFor         支持回滚的异常, 默认支持 {RuntimeException.class, Error.class}
+     * @param task                执行体
+     * @return
      */
-    public final <X extends Throwable> void execute(int isolationLevel, int propagationBehavior, Collection<Class<? extends Throwable>> rollbackFor,
-                                                    ThrowableExecution<X> task) throws X {
+    public final <R, X extends Throwable> R execute(int isolationLevel, int propagationBehavior, Collection<Class<? extends Throwable>> rollbackFor,
+                                                    ThrowableExecution<R, X> task) throws X {
 
         Set<Class<? extends Throwable>> rollbackForSet = new HashSet<>(rollbackFor);
         Collections.addAll(rollbackForSet, RuntimeException.class, Error.class);
 
         TransactionStatus transaction = springTransactionHelper.createTransaction(isolationLevel, propagationBehavior);
+        R ret;
         try {
-            task.execute();
+            ret = task.execute();
             springTransactionHelper.commit(transaction);
         } catch (Throwable throwable) {
             for (Class<? extends Throwable> rollback : rollbackForSet) {
                 if (rollback.isAssignableFrom(throwable.getClass())) {
                     springTransactionHelper.rollback(transaction);
-                    return;
+                    break;
                 }
             }
             throw throwable;
         }
+        return ret;
     }
 }

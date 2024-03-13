@@ -6,7 +6,7 @@ package org.cqq.openlibrary.common.func;
  * @author Qingquan.Cong
  */
 @FunctionalInterface
-public interface ThrowableExecution<X extends Throwable> {
+public interface ThrowableExecution<R, X extends Throwable> {
 
-    void execute() throws X;
+    R execute() throws X;
 }

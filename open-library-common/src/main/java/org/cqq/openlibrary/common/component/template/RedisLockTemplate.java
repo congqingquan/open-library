@@ -25,14 +25,14 @@ public class RedisLockTemplate {
      * @param lockFailedException 加锁失败时抛出的异常
      * @param task 执行体
      */
-    public <LX extends Throwable, TX extends Throwable> void execute(String lockKey, Long waitTime, TimeUnit timeUnit, LX lockFailedException,
-                                                                     ThrowableExecution<TX> task) throws LX, TX {
+    public <R, LX extends Throwable, TX extends Throwable> R execute(String lockKey, Long waitTime, TimeUnit timeUnit, LX lockFailedException,
+                                                                     ThrowableExecution<R, TX> task) throws LX, TX {
         RLock lock = redissonClient.getLock(lockKey);
         try {
             if (!lock.tryLock(waitTime, timeUnit)) {
                 throw lockFailedException;
             }
-            task.execute();
+            return task.execute();
         } catch (InterruptedException e) {
             throw lockFailedException;
         } finally {
