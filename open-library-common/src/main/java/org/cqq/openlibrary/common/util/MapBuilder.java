@@ -17,10 +17,27 @@ public class MapBuilder<K, V> {
     }
     
     public MapBuilder<K, V> put(K k, V v) {
-        container.put(k, v);
+        return put(true, k, v);
+    }
+
+    public MapBuilder<K, V> put(boolean condition, K k, V v) {
+        if (condition) {
+            container.put(k, v);
+        }
         return this;
     }
-    
+
+    public MapBuilder<K, V> putAll(Map<K, V> map) {
+        return putAll(true, map);
+    }
+
+    public MapBuilder<K, V> putAll(boolean condition, Map<K, V> map) {
+        if (condition) {
+            container.putAll(map);
+        }
+        return this;
+    }
+
     public Map<K, V> build() {
         return container;
     }
