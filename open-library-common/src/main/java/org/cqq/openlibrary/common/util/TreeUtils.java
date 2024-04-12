@@ -16,7 +16,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -27,43 +27,48 @@ import java.util.function.Supplier;
  * @author CongQingquan
  */
 public class TreeUtils {
-    
+
     private TreeUtils() {
     }
-    
+
     /**
      * 树化方法的参数封装接口
      */
     public interface ToTreeParam<T, ID> {
-        
+
         /**
-         * 获取id提取器 (id & pid同类型)
+         * id提取器 (id & pid同类型)
          */
-        Function<T, ID> getIdExtractor();
-        
+        Function<T, ID> idExtractor();
+
         /**
-         * 获取pid提取器 (id & pid同类型)
+         * pid提取器 (id & pid同类型)
          */
-        Function<T, ID> getPidExtractor();
-        
+        Function<T, ID> pidExtractor();
+
         /**
          * 节点排序比较器
          */
-        Comparator<? super T> getComparator();
-        
+        Comparator<? super T> comparator();
+
         /**
-         * 获取设置子节点的BiConsumer
+         * children 提取器
          */
-        BiConsumer<T, Collection<T>> getSettingChildrenBiConsumer();
-        
+        Function<T, Collection<? super T>> childrenExtractor();
+
+        /**
+         * 初始化 children
+         */
+        Consumer<T> initChildren();
+
         /**
          * 获取默认的根元素断言 (test: pid == null)
          */
-        default Predicate<T> getRootPredicate() {
-            return (n) -> this.getPidExtractor().apply(n) == null;
+        default Predicate<T> rootPredicate() {
+            return (n) -> this.pidExtractor().apply(n) == null;
         }
     }
-    
+
     /**
      * 树化
      *
@@ -73,33 +78,31 @@ public class TreeUtils {
         if (param == null) {
             throw new IllegalArgumentException("To tree param cannot be null");
         }
-        return toTree(nodes, param.getIdExtractor(), param.getPidExtractor(), param.getRootPredicate(),
-                param.getComparator(), param.getSettingChildrenBiConsumer());
+        return toTree(
+                nodes, param.idExtractor(), param.pidExtractor(), param.rootPredicate(), param.childrenExtractor(), param.initChildren(), param.comparator()
+        );
     }
-    
+
     /**
      * 树化
      * 1. id data type === parent id data type
      * 2. 默认的，root node: pidExtractor.apply(node) == null & child node: pidExtractor.apply(node) != null
      *
-     * @param nodes           节点集合
-     * @param idExtractor     id提取器 (id & pid同类型)
-     * @param pidExtractor    pid提取器 (id & pid同类型)
-     * @param <T>             节点类型
-     * @param <ID>            id数据类型 (id & pid同类型)
-     * @param isRoot          根节点断言
-     * @param comparator      节点排序比较器
-     * @param settingChildren 设置子节点
-     *                        1. 为什么用 set 的方式而不是 get 的方式？
-     *                        考虑 get 的 children collection 可能为 null 的情况，初始化后无法进行 children 数据的写回，希望调用者提前写初始化操作
-     *                        2. 调用者在初始化 children 容器时，根据容器底层使用的数据结构，可能会影响到 children 节点根据 comparator 的排序顺序
+     * @param nodes             节点集合
+     * @param idExtractor       id 提取器 (id & pid同类型)
+     * @param pidExtractor      pid 提取器 (id & pid同类型)
+     * @param isRoot            根节点断言
+     * @param childrenExtractor children 提取器
+     * @param initChildren      初始化 children(当 node.children == null 时调用)
+     * @param comparator        节点排序比较器
      */
     public static <T, ID> TreeSet<T> toTree(final Collection<T> nodes,
                                             final Function<T, ID> idExtractor,
                                             final Function<T, ID> pidExtractor,
                                             final Predicate<T> isRoot,
-                                            final Comparator<? super T> comparator,
-                                            final BiConsumer<T, Collection<T>> settingChildren) {
+                                            final Function<T, Collection<? super T>> childrenExtractor,
+                                            final Consumer<T> initChildren,
+                                            final Comparator<? super T> comparator) {
         if (idExtractor == null || pidExtractor == null) {
             throw new IllegalArgumentException("Extractor cannot be null");
         }
@@ -110,34 +113,39 @@ public class TreeUtils {
         if (CollectionUtils.isEmpty(nodes)) {
             return roots;
         }
-        final Map<ID, Collection<T>> childrenMapping = new HashMap<>(16);
-        nodes.forEach(node -> {
+        final Map<ID, TreeSet<T>> childrenMapping = new HashMap<>(16);
+        for (T node : nodes) {
             if (isRoot.test(node)) {
                 roots.add(node);
-                return;
+                continue;
             }
             childrenMapping.computeIfAbsent(pidExtractor.apply(node), (id) -> new TreeSet<>(comparator)).add(node);
-        });
-        
+
+        }
         final Deque<T> stack = new LinkedList<>();
-        roots.forEach(root -> {
+        for (T root : roots) {
             stack.add(root);
             while (stack.size() > 0) {
                 T currentNode = stack.pop();
                 ID currentNodeId = idExtractor.apply(currentNode);
-                Collection<T> cc = childrenMapping.get(currentNodeId);
-                if (CollectionUtils.isEmpty(cc)) {
+                TreeSet<T> currentNodeChildren = childrenMapping.get(currentNodeId);
+                if (CollectionUtils.isEmpty(currentNodeChildren)) {
                     continue;
                 }
-                for (T cn : cc) {
+                for (T cn : currentNodeChildren) {
                     stack.push(cn);
                 }
-                settingChildren.accept(currentNode, cc);
+                Collection<? super T> existsChildren = childrenExtractor.apply(currentNode);
+                if (existsChildren == null) {
+                    initChildren.accept(currentNode);
+                }
+                existsChildren = childrenExtractor.apply(currentNode);
+                existsChildren.addAll(currentNodeChildren);
             }
-        });
+        }
         return roots;
     }
-    
+
     /**
      * 扁平化树形数据
      *
@@ -160,12 +168,12 @@ public class TreeUtils {
         }
         return col;
     }
-    
+
     public static void main(String[] args) {
         toTreeTest();
 //        flatMapTest();
     }
-    
+
     private static void toTreeTest() {
         // 组装数据
         @Data
@@ -173,20 +181,20 @@ public class TreeUtils {
             String id;
             String parentId;
             List<Node> children;
-            
+
             public Node(String id, String parentId, List<Node> children) {
                 this.id = id;
                 this.parentId = parentId;
                 this.children = children;
             }
         }
-        
+
         LinkedList<Node> roots = new LinkedList<>();
         roots.add(new Node("A", null, null));
         roots.add(new Node("B", null, null));
         roots.add(new Node("C", null, null));
-        
-        
+
+
         LinkedList<Node> children = new LinkedList<>();
         children.add(new Node("A1", "A", null));
         children.add(new Node("A11", "A1", null));
@@ -194,65 +202,60 @@ public class TreeUtils {
         children.add(new Node("B1", "B", null));
         children.add(new Node("C1", "C", null));
         children.add(new Node("C11", "C1", null));
-        
+
         roots.addAll(children);
-        
+
         // 1. 不使用参数封装
-        TreeSet<Node> tree = TreeUtils.toTree(roots, Node::getId, Node::getParentId,
+        TreeSet<Node> tree = TreeUtils.toTree(
+                roots,
+                Node::getId,
+                Node::getParentId,
                 (node) -> node.getParentId() == null,
-                Comparator.comparing(Node::getId).reversed(),
-                (node, cns) -> {
-                    List<Node> cl = node.getChildren();
-                    if (cl == null) {
-                        node.setChildren(new ArrayList<>(cns));
-                        return;
-                    }
-                    cl.addAll(cns);
-                });
-        tree.first();
+                Node::getChildren, node -> node.setChildren(new ArrayList<>()),
+                Comparator.comparing(Node::getId).reversed()
+        );
         System.out.println(tree);
-        
+
         // 2. 使用参数封装
         class DefaultToTreeParam implements ToTreeParam<Node, String> {
+
             @Override
-            public Function<Node, String> getIdExtractor() {
+            public Function<Node, String> idExtractor() {
                 return Node::getId;
             }
-            
+
             @Override
-            public Function<Node, String> getPidExtractor() {
+            public Function<Node, String> pidExtractor() {
                 return Node::getParentId;
             }
-            
+
             @Override
-            public Predicate<Node> getRootPredicate() {
+            public Predicate<Node> rootPredicate() {
                 return (n) -> n.getId().length() == 2;
             }
-            
+
             @Override
-            public Comparator<? super Node> getComparator() {
+            public Comparator<? super Node> comparator() {
                 return Comparator.comparing(Node::getId).reversed();
             }
-            
+
             @Override
-            public BiConsumer<Node, Collection<Node>> getSettingChildrenBiConsumer() {
-                return (node, cns) -> {
-                    List<Node> cl = node.getChildren();
-                    if (cl == null) {
-                        node.setChildren(new ArrayList<>(cns));
-                        return;
-                    }
-                    cl.addAll(cns);
-                };
+            public Function<Node, Collection<? super Node>> childrenExtractor() {
+                return Node::getChildren;
+            }
+
+            @Override
+            public Consumer<Node> initChildren() {
+                return node -> node.setChildren(new ArrayList<>());
             }
         }
-        
+
         Collection<Node> tree2 = TreeUtils.toTree(children, new DefaultToTreeParam());
-        
+
         System.out.println(tree2);
     }
-    
-    
+
+
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
@@ -261,7 +264,7 @@ public class TreeUtils {
         private String parentId;
         private List<SubNode> children;
     }
-    
+
     @Data
     @EqualsAndHashCode(callSuper = true)
     static class SubNode extends Node {
@@ -269,9 +272,9 @@ public class TreeUtils {
             super(id, parentId, children);
         }
     }
-    
+
     private static void flatMapTest() {
-        
+
         LinkedList<SubNode> roots = new LinkedList<>();
         roots.add(new SubNode("A", null, new ArrayList<>(Arrays.asList(
                 new SubNode("A1", null, new ArrayList<>(Arrays.asList(
@@ -282,7 +285,7 @@ public class TreeUtils {
                 new SubNode("B1", null, null)
         ))));
         roots.add(new SubNode("C", null, null));
-        
+
         LinkedHashSet<Node> nodes = TreeUtils.flatMap(roots, SubNode::getChildren, LinkedHashSet::new);
         System.out.println(nodes);
     }
