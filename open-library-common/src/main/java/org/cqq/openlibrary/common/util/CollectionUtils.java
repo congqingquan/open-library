@@ -84,6 +84,8 @@ public class CollectionUtils {
         list.add(list.size(), remove);
     }
 
+    // cur < target: insert current element after target element
+    // cur > target: insert current element before target element
     public static <T> void move(List<T> list, BiPredicate<Integer, ? super T> from, BiPredicate<Integer, ? super T> to) {
         if (isEmpty(list)) {
             return;

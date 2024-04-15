@@ -103,7 +103,7 @@ public class TreeUtils {
                                             final Function<T, Collection<? super T>> childrenExtractor,
                                             final Consumer<T> initChildren,
                                             final Comparator<? super T> comparator) {
-        if (idExtractor == null || pidExtractor == null) {
+        if (idExtractor == null || pidExtractor == null || childrenExtractor == null) {
             throw new IllegalArgumentException("Extractor cannot be null");
         }
         if (isRoot == null) {
@@ -120,7 +120,6 @@ public class TreeUtils {
                 continue;
             }
             childrenMapping.computeIfAbsent(pidExtractor.apply(node), (id) -> new TreeSet<>(comparator)).add(node);
-
         }
         final Deque<T> stack = new LinkedList<>();
         for (T root : roots) {
@@ -153,9 +152,9 @@ public class TreeUtils {
      * @param childrenExtractor 子节点列表提取器
      * @param container         结果容器
      */
-    public static <T, C extends Collection<? super T>> C flatMap(Collection<T> nodes,
-                                                                 Function<T, Collection<? extends T>> childrenExtractor,
-                                                                 Supplier<C> container) {
+    public static <T, C extends Collection<? super T>> C flat(Collection<T> nodes,
+                                                              Function<T, Collection<? extends T>> childrenExtractor,
+                                                              Supplier<C> container) {
         C col = container.get();
         final Deque<T> stack = new LinkedList<>(nodes);
         while (stack.size() > 0) {
@@ -286,7 +285,7 @@ public class TreeUtils {
         ))));
         roots.add(new SubNode("C", null, null));
 
-        LinkedHashSet<Node> nodes = TreeUtils.flatMap(roots, SubNode::getChildren, LinkedHashSet::new);
+        LinkedHashSet<Node> nodes = TreeUtils.flat(roots, SubNode::getChildren, LinkedHashSet::new);
         System.out.println(nodes);
     }
 }
