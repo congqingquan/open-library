@@ -1,13 +1,21 @@
 package org.cqq.openlibrary.common.util;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
+import java.util.function.Function;
 
 /**
  * Collection utils
@@ -44,7 +52,7 @@ public class CollectionUtils {
         return coll;
     }
 
-    // ====================================== Test method ======================================
+    // ====================================== Help method ======================================
 
     public static boolean isEmpty(Collection<?> collection) {
         return collection == null || collection.size() == 0;
@@ -52,6 +60,38 @@ public class CollectionUtils {
 
     public static boolean isNotEmpty(Collection<?> collection) {
         return !isEmpty(collection);
+    }
+
+    public static <T> void deepForeach(Collection<? extends T> collection,
+                                       Function<? super T, Collection<? extends T>> downField,
+                                       BiConsumer<LinkedList<T>, T> action) {
+        if (isEmpty(collection)) {
+            return;
+        }
+        for (T element : collection) {
+            Collection<? extends T> downColl = downField.apply(element);
+            if (isEmpty(downColl)) {
+                continue;
+            }
+            LinkedList<T> path = newLinkedList();
+            action.accept(path, element);
+            deepForeachRecursion(path, element, downField, action);
+        }
+    }
+
+    public static <T> void deepForeachRecursion(LinkedList<T> path, T element,
+                                                Function<? super T, Collection<? extends T>> downField,
+                                                BiConsumer<LinkedList<T>, T> action) {
+        Collection<? extends T> downColl = downField.apply(element);
+        if (isEmpty(downColl)) {
+            return;
+        }
+        path.addLast(element);
+        for (T downElement : downColl) {
+            action.accept(path, downElement);
+            deepForeachRecursion(path, downElement, downField, action);
+        }
+        path.removeLast();
     }
 
     // ====================================== List method ======================================
@@ -103,9 +143,29 @@ public class CollectionUtils {
     }
 
     public static void main(String[] args) {
-        List<Integer> strings = newLinkedList(1, 2, 3, 4, 5, 6, 7, 8);
-//        move(strings, (i, s) -> s.equals("C"), (i, s) -> s.equals("B"));
-        move(strings, (i, str) -> str.equals(1), (i, str) -> str.equals(3));
-        System.out.println(strings);
+        deepForeachTest();
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Accessors(chain = true)
+    static class DeepForeachNode {
+        private String id;
+        private List<DeepForeachNode> children;
+    }
+
+    private static void deepForeachTest() {
+        DeepForeachNode deepForeachNode = new DeepForeachNode("A", Arrays.asList(
+                new DeepForeachNode("A1", Arrays.asList(
+                        new DeepForeachNode("A11", null),
+                        new DeepForeachNode("A12", null)
+                )),
+                new DeepForeachNode("A2", null)
+        ));
+
+        deepForeach(Collections.singleton(deepForeachNode), DeepForeachNode::getChildren, (path, element) -> {
+            System.out.println();
+        });
     }
 }

@@ -16,10 +16,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 /**
  * Tree utils
@@ -29,58 +31,6 @@ import java.util.function.Supplier;
 public class TreeUtils {
 
     private TreeUtils() {
-    }
-
-    /**
-     * 树化方法的参数封装接口
-     */
-    public interface ToTreeParam<T, ID> {
-
-        /**
-         * id提取器 (id & pid同类型)
-         */
-        Function<T, ID> idExtractor();
-
-        /**
-         * pid提取器 (id & pid同类型)
-         */
-        Function<T, ID> pidExtractor();
-
-        /**
-         * 节点排序比较器
-         */
-        Comparator<? super T> comparator();
-
-        /**
-         * children 提取器
-         */
-        Function<T, Collection<? super T>> childrenExtractor();
-
-        /**
-         * 初始化 children
-         */
-        Consumer<T> initChildren();
-
-        /**
-         * 获取默认的根元素断言 (test: pid == null)
-         */
-        default Predicate<T> rootPredicate() {
-            return (n) -> this.pidExtractor().apply(n) == null;
-        }
-    }
-
-    /**
-     * 树化
-     *
-     * @param param 参数封装类
-     */
-    public static <T, ID> TreeSet<T> toTree(Collection<T> nodes, ToTreeParam<T, ID> param) {
-        if (param == null) {
-            throw new IllegalArgumentException("To tree param cannot be null");
-        }
-        return toTree(
-                nodes, param.idExtractor(), param.pidExtractor(), param.rootPredicate(), param.childrenExtractor(), param.initChildren(), param.comparator()
-        );
     }
 
     /**
@@ -96,12 +46,12 @@ public class TreeUtils {
      * @param initChildren      初始化 children(当 node.children == null 时调用)
      * @param comparator        节点排序比较器
      */
-    public static <T, ID> TreeSet<T> toTree(final Collection<T> nodes,
-                                            final Function<T, ID> idExtractor,
-                                            final Function<T, ID> pidExtractor,
-                                            final Predicate<T> isRoot,
-                                            final Function<T, Collection<? super T>> childrenExtractor,
-                                            final Consumer<T> initChildren,
+    public static <T, ID> TreeSet<T> toTree(final Collection<? extends T> nodes,
+                                            final Function<? super T, ID> idExtractor,
+                                            final Function<? super T, ID> pidExtractor,
+                                            final Predicate<? super T> isRoot,
+                                            final Function<? super T, Collection<? super T>> childrenExtractor,
+                                            final Consumer<? super T> initChildren,
                                             final Comparator<? super T> comparator) {
         if (idExtractor == null || pidExtractor == null || childrenExtractor == null) {
             throw new IllegalArgumentException("Extractor cannot be null");
@@ -152,8 +102,8 @@ public class TreeUtils {
      * @param childrenExtractor 子节点列表提取器
      * @param container         结果容器
      */
-    public static <T, C extends Collection<? super T>> C flat(Collection<T> nodes,
-                                                              Function<T, Collection<? extends T>> childrenExtractor,
+    public static <T, C extends Collection<? super T>> C flat(Collection<? extends T> nodes,
+                                                              Function<? super T, Collection<? extends T>> childrenExtractor,
                                                               Supplier<C> container) {
         C col = container.get();
         final Deque<T> stack = new LinkedList<>(nodes);
@@ -168,9 +118,64 @@ public class TreeUtils {
         return col;
     }
 
+    /**
+     * 树节点类型转换
+     *
+     * @param sourceNodes                 源节点集合
+     * @param sourceNodeChildrenExtractor 源节点子节点列表提取器
+     * @param targetNodeChildrenExtractor 目标节点子节点列表提取器
+     * @param mapping                     类型转换过程
+     * @param container                   目标列表容器
+     */
+    public static <T, R, C extends Collection<? super R>> C convert(Collection<? extends T> sourceNodes,
+                                                                    Function<? super T, Collection<? extends T>> sourceNodeChildrenExtractor,
+                                                                    Function<? super R, Collection<? super R>> targetNodeChildrenExtractor,
+                                                                    Consumer<? super R> initTargetChildren,
+                                                                    BiFunction<T, LinkedList<? extends R>, R> mapping,
+                                                                    Supplier<C> container) {
+        C col = container.get();
+        for (T sourceNode : sourceNodes) {
+            col.add(
+                    convertRecursion(
+                            sourceNode, sourceNodeChildrenExtractor, targetNodeChildrenExtractor, initTargetChildren, new LinkedList<>(), mapping
+                    )
+            );
+        }
+        return col;
+    }
+
+    private static <T, R> R convertRecursion(T sourceNode,
+                                             Function<? super T, Collection<? extends T>> sourceNodesChildrenExtractor,
+                                             Function<? super R, Collection<? super R>> targetNodeChildrenExtractor,
+                                             Consumer<? super R> initTargetChildren,
+                                             LinkedList<R> pathNodes,
+                                             BiFunction<T, LinkedList<? extends R>, R> mapping) {
+
+        R target = mapping.apply(sourceNode, pathNodes);
+        initTargetChildren.accept(target);
+
+        Collection<? extends T> sourceNodeChildren = sourceNodesChildrenExtractor.apply(sourceNode);
+        if (CollectionUtils.isEmpty(sourceNodeChildren)) {
+            return target;
+        }
+
+        pathNodes.addLast(target);
+        Collection<? super R> targetNodeChildren = targetNodeChildrenExtractor.apply(target);
+        for (T sourceChild : sourceNodeChildren) {
+            targetNodeChildren.add(
+                    convertRecursion(sourceChild, sourceNodesChildrenExtractor, targetNodeChildrenExtractor, initTargetChildren,
+                            pathNodes, mapping)
+            );
+        }
+        pathNodes.removeLast();
+
+        return target;
+    }
+
     public static void main(String[] args) {
-        toTreeTest();
+//        toTreeTest();
 //        flatMapTest();
+        convertTest();
     }
 
     private static void toTreeTest() {
@@ -204,7 +209,6 @@ public class TreeUtils {
 
         roots.addAll(children);
 
-        // 1. 不使用参数封装
         TreeSet<Node> tree = TreeUtils.toTree(
                 roots,
                 Node::getId,
@@ -214,78 +218,92 @@ public class TreeUtils {
                 Comparator.comparing(Node::getId).reversed()
         );
         System.out.println(tree);
-
-        // 2. 使用参数封装
-        class DefaultToTreeParam implements ToTreeParam<Node, String> {
-
-            @Override
-            public Function<Node, String> idExtractor() {
-                return Node::getId;
-            }
-
-            @Override
-            public Function<Node, String> pidExtractor() {
-                return Node::getParentId;
-            }
-
-            @Override
-            public Predicate<Node> rootPredicate() {
-                return (n) -> n.getId().length() == 2;
-            }
-
-            @Override
-            public Comparator<? super Node> comparator() {
-                return Comparator.comparing(Node::getId).reversed();
-            }
-
-            @Override
-            public Function<Node, Collection<? super Node>> childrenExtractor() {
-                return Node::getChildren;
-            }
-
-            @Override
-            public Consumer<Node> initChildren() {
-                return node -> node.setChildren(new ArrayList<>());
-            }
-        }
-
-        Collection<Node> tree2 = TreeUtils.toTree(children, new DefaultToTreeParam());
-
-        System.out.println(tree2);
     }
 
 
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    static class Node {
+    static class FlatNode {
         private String id;
         private String parentId;
-        private List<SubNode> children;
+        private List<SubFlatNode> children;
     }
 
     @Data
     @EqualsAndHashCode(callSuper = true)
-    static class SubNode extends Node {
-        public SubNode(String id, String parentId, List<SubNode> children) {
+    static class SubFlatNode extends FlatNode {
+        public SubFlatNode(String id, String parentId, List<SubFlatNode> children) {
             super(id, parentId, children);
         }
     }
 
     private static void flatMapTest() {
 
-        LinkedList<SubNode> roots = new LinkedList<>();
-        roots.add(new SubNode("A", null, new ArrayList<>(Arrays.asList(
-                new SubNode("A1", null, new ArrayList<>(Arrays.asList(
-                        new SubNode("A11", null, null)
+        LinkedList<SubFlatNode> roots = new LinkedList<>();
+        roots.add(new SubFlatNode("A", null, new ArrayList<>(Arrays.asList(
+                new SubFlatNode("A1", null, new ArrayList<>(Arrays.asList(
+                        new SubFlatNode("A11", null, null)
                 )))
         ))));
-        roots.add(new SubNode("B", null, new ArrayList<>(Arrays.asList(
-                new SubNode("B1", null, null)
+        roots.add(new SubFlatNode("B", null, new ArrayList<>(Arrays.asList(
+                new SubFlatNode("B1", null, null)
         ))));
-        roots.add(new SubNode("C", null, null));
+        roots.add(new SubFlatNode("C", null, null));
 
-        LinkedHashSet<Node> nodes = TreeUtils.flat(roots, SubNode::getChildren, LinkedHashSet::new);
+        LinkedHashSet<FlatNode> nodes = TreeUtils.flat(roots, SubFlatNode::getChildren, LinkedHashSet::new);
+        System.out.println(nodes);
+    }
+
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    static class ConvertNode {
+        private String id;
+        private String parentId;
+        private List<ConvertNode> children;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    static class AnotherConvertNode {
+        private String id;
+        private String parentId;
+        private String path;
+        private List<AnotherConvertNode> children;
+    }
+
+
+    private static void convertTest() {
+        LinkedList<ConvertNode> roots = new LinkedList<>();
+        roots.add(new ConvertNode("A", null, new ArrayList<>(Arrays.asList(
+                new ConvertNode("A1", null, new ArrayList<>(Arrays.asList(
+                        new ConvertNode("A11", null, null)
+                )))
+        ))));
+        roots.add(new ConvertNode("B", null, new ArrayList<>(Arrays.asList(
+                new ConvertNode("B1", null, null)
+        ))));
+        roots.add(new ConvertNode("C", null, null));
+
+        List<AnotherConvertNode> nodes = TreeUtils.convert(
+                roots,
+                ConvertNode::getChildren,
+                AnotherConvertNode::getChildren,
+                r -> r.setChildren(new ArrayList<>()),
+                (node, pathNodes) -> {
+                    AnotherConvertNode anotherConvertNode = new AnotherConvertNode();
+                    anotherConvertNode.setId(node.getId());
+                    anotherConvertNode.setParentId(node.getParentId());
+
+                    List<AnotherConvertNode> temp = new ArrayList<>(pathNodes);
+                    temp.add(anotherConvertNode);
+                    anotherConvertNode.setPath(temp.stream().map(AnotherConvertNode::getId).collect(Collectors.joining(",")));
+                    return anotherConvertNode;
+                }, ArrayList::new);
+
         System.out.println(nodes);
     }
 }
