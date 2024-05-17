@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
 /**
- * Bean utils (Based on CGLIB. Support deep copy)
+ * Bean utils (Based on CGLIB. Support deep copy) (Cannot work on JDK17)
  *
  * @author Qingquan.Cong
  */
