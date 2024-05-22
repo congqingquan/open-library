@@ -46,18 +46,18 @@ public class JWSUtils {
     /**
      * Sign
      *
-     * @param header             元数据
-     * @param payload            载体
-     * @param signatureAlgorithm 签名算法
-     * @param secretKey          签名密匙（对于不同的签名算法有不同的意义）
-     * @param duration           有效时长
+     * @param header               元数据
+     * @param payload              载体
+     * @param signatureAlgorithm   签名算法
+     * @param secretKey            签名密匙（对于不同的签名算法有不同的意义）
+     * @param durationMilliseconds 有效时长 (毫秒)
      * @return
      */
     public static String sign(@Nullable Map<String, Object> header,
                               @Nullable Map<String, Object> payload,
                               SignatureAlgorithm signatureAlgorithm,
                               String secretKey,
-                              long duration) {
+                              long durationMilliseconds) {
         if (header == null) {
             header = new HashMap<>();
         }
@@ -66,7 +66,7 @@ public class JWSUtils {
         return Jwts.builder()
                 .setHeader(header)
                 .setClaims(payload)
-                .setExpiration(new Date(System.currentTimeMillis() + duration))
+                .setExpiration(new Date(System.currentTimeMillis() + durationMilliseconds))
                 .signWith(new SecretKeySpec(secretKey.getBytes(), signatureAlgorithm.getJcaName()))
                 .compact();
     }
@@ -150,17 +150,17 @@ public class JWSUtils {
     /**
      * Refresh token (Must call valid function before calling refresh function)
      *
-     * @param token              需要刷新的 token
-     * @param signatureAlgorithm 签名算法
-     * @param secretKey          签名密匙（对于不同的签名算法有不同的意义）
-     * @param duration           有效时长
+     * @param token                需要刷新的 token
+     * @param signatureAlgorithm   签名算法
+     * @param secretKey            签名密匙（对于不同的签名算法有不同的意义）
+     * @param durationMilliseconds 有效时长 (毫秒)
      * @return
      */
-    public static String refresh(String token, SignatureAlgorithm signatureAlgorithm, String secretKey, long duration) {
+    public static String refresh(String token, SignatureAlgorithm signatureAlgorithm, String secretKey, long durationMilliseconds) {
         if (!valid(token, signatureAlgorithm, secretKey)) {
             throw new IllegalArgumentException("Expired token");
         }
         Jwt<Header<?>, Claims> parseRes = parse(token, signatureAlgorithm, secretKey, 5L);
-        return sign(parseRes.getHeader(), parseRes.getBody(), signatureAlgorithm, secretKey, duration);
+        return sign(parseRes.getHeader(), parseRes.getBody(), signatureAlgorithm, secretKey, durationMilliseconds);
     }
 }
