@@ -52,6 +52,10 @@ public class JSONUtils {
         return callMapper(m -> m.readValue(jsonObject, objectType));
     }
 
+    public static <T> T parseObject(String jsonObject, TypeReference<T> objectType) {
+        return callMapper(m -> m.readValue(jsonObject, objectType));
+    }
+
     public static <T extends Collection<E>, E> T parseArray(String jsonArray, Supplier<T> collectorSupplier) {
         T collector = collectorSupplier.get();
         try {
@@ -64,7 +68,7 @@ public class JSONUtils {
         return collector;
     }
 
-    public static String toJsonString(Object obj) {
+    public static String toJSONString(Object obj) {
         return callMapper(m -> m.writeValueAsString(obj));
     }
 }

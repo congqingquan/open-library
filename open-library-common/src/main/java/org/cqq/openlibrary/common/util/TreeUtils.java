@@ -15,6 +15,7 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
@@ -122,6 +123,10 @@ public class TreeUtils {
                                                               Function<? super T, Collection<? extends T>> childrenExtractor,
                                                               Supplier<C> container) {
         C col = container.get();
+        if (CollectionUtils.isEmpty(nodes)) {
+            return col;
+        }
+
         Deque<T> stack = new LinkedList<>(nodes);
         while (stack.size() > 0) {
             T pop = stack.pop();
@@ -138,22 +143,25 @@ public class TreeUtils {
      * 树节点类型转换
      *
      * @param sourceNodes                 源节点集合
-     * @param sourceNodeChildrenExtractor 源节点子节点列表提取器
-     * @param targetNodeChildrenExtractor 目标节点子节点列表提取器
      * @param mapping                     类型转换过程
+     * @param sourceNodeChildrenExtractor 源节点子节点列表提取器
+     * @param initTargetNodeChildren      初始、返回目标节点的子节点容器
      * @param container                   目标列表容器
      */
     public static <T, R, C extends Collection<? super R>> C convert(Collection<? extends T> sourceNodes,
-                                                                    Function<? super T, Collection<? extends T>> sourceNodeChildrenExtractor,
-                                                                    Function<? super R, Collection<? super R>> targetNodeChildrenExtractor,
-                                                                    Consumer<? super R> initTargetChildren,
                                                                     BiFunction<T, LinkedList<? extends R>, R> mapping,
+                                                                    Function<? super T, Collection<? extends T>> sourceNodeChildrenExtractor,
+                                                                    Function<? super R, Collection<? super R>> initTargetNodeChildren,
                                                                     Supplier<C> container) {
         C col = container.get();
+        if (CollectionUtils.isEmpty(sourceNodes)) {
+            return col;
+        }
+
         for (T sourceNode : sourceNodes) {
             col.add(
                     convertRecursion(
-                            sourceNode, sourceNodeChildrenExtractor, targetNodeChildrenExtractor, initTargetChildren, new LinkedList<>(), mapping
+                            sourceNode, mapping, sourceNodeChildrenExtractor, initTargetNodeChildren, new LinkedList<>()
                     )
             );
         }
@@ -161,16 +169,15 @@ public class TreeUtils {
     }
     
     private static <T, R> R convertRecursion(T sourceNode,
+                                             BiFunction<T, LinkedList<? extends R>, R> mapping,
                                              Function<? super T, Collection<? extends T>> sourceNodesChildrenExtractor,
-                                             Function<? super R, Collection<? super R>> targetNodeChildrenExtractor,
-                                             Consumer<? super R> initTargetChildren,
-                                             LinkedList<R> pathNodes,
-                                             BiFunction<T, LinkedList<? extends R>, R> mapping) {
+                                             Function<? super R, Collection<? super R>> initTargetNodeChildren,
+                                             LinkedList<R> pathNodes) {
         
         R target = mapping.apply(sourceNode, pathNodes);
         
         // pre init target children
-        // initTargetChildren.accept(target);
+        // Collection<? super R> targetNodeChildren = initTargetNodeChildren.apply(target);
         
         Collection<? extends T> sourceNodeChildren = sourceNodesChildrenExtractor.apply(sourceNode);
         if (CollectionUtils.isEmpty(sourceNodeChildren)) {
@@ -178,14 +185,13 @@ public class TreeUtils {
         }
         
         // lazy init target children
-        initTargetChildren.accept(target);
+        Collection<? super R> targetNodeChildren = initTargetNodeChildren.apply(target);
         
         pathNodes.addLast(target);
-        Collection<? super R> targetNodeChildren = targetNodeChildrenExtractor.apply(target);
         for (T sourceChild : sourceNodeChildren) {
             targetNodeChildren.add(
-                    convertRecursion(sourceChild, sourceNodesChildrenExtractor, targetNodeChildrenExtractor, initTargetChildren,
-                            pathNodes, mapping)
+                    convertRecursion(sourceChild, mapping, sourceNodesChildrenExtractor, initTargetNodeChildren,
+                            pathNodes)
             );
         }
         pathNodes.removeLast();
@@ -211,9 +217,12 @@ public class TreeUtils {
                                                                                Function<? super T, ID> pidExtractor,
                                                                                Predicate<? super T> isTopRoot,
                                                                                Supplier<C> container) {
+        C collector = container.get();
+        if (CollectionUtils.isEmpty(nodes) || CollectionUtils.isEmpty(childNodes)) {
+            return null;
+        }
         Map<ID, ? extends T> nodesMap = nodes.stream().collect(Collectors.toMap(idExtractor, Function.identity()));
         Map<ID, ? extends T> searchCacheMap = childNodes.stream().collect(Collectors.toMap(idExtractor, Function.identity()));
-        C collector = container.get();
         for (T childNode : childNodes) {
             searchParentNodesRecursion(nodesMap, searchCacheMap, childNode, idExtractor, pidExtractor, isTopRoot, collector);
         }
@@ -249,14 +258,14 @@ public class TreeUtils {
      * @param childrenExtractor children 提取器
      * @param predicate         断言节点
      */
-    public static <T> T searchNode(Collection<? extends T> nodes,
-                                   Function<? super T, Collection<? extends T>> childrenExtractor,
-                                   BiPredicate<LinkedList<? extends T>, ? super T> predicate) {
-        AtomicReference<T> res = new AtomicReference<>(null);
+    public static <T> Optional<T> searchNode(Collection<? extends T> nodes,
+                                          Function<? super T, Collection<? extends T>> childrenExtractor,
+                                          BiPredicate<LinkedList<? extends T>, ? super T> predicate) {
+        AtomicReference<Optional<T>> res = new AtomicReference<>(Optional.empty());
         breakableForeach(nodes, childrenExtractor, (pathNodes, node) -> {
             boolean test = predicate.test(pathNodes, node);
             if (test) {
-                res.set(node);
+                res.set(Optional.ofNullable(node));
             }
             return test;
         });
@@ -289,6 +298,9 @@ public class TreeUtils {
     public static <T> void breakableForeach(Collection<? extends T> nodes,
                                             Function<? super T, Collection<? extends T>> childrenExtractor,
                                             BiPredicate<LinkedList<? extends T>, ? super T> consumer) {
+        if (CollectionUtils.isEmpty(nodes)) {
+            return;
+        }
         for (T node : nodes) {
             if (breakableForeachRecursion(node, new LinkedList<>(), childrenExtractor, consumer)) {
                 return;
@@ -441,19 +453,22 @@ public class TreeUtils {
             
             List<AnotherConvertNode> nodes = TreeUtils.convert(
                     roots,
-                    ConvertNode::getChildren,
-                    AnotherConvertNode::getChildren,
-                    r -> r.setChildren(new ArrayList<>()),
                     (node, pathNodes) -> {
                         AnotherConvertNode anotherConvertNode = new AnotherConvertNode();
                         anotherConvertNode.setId(node.getId());
                         anotherConvertNode.setParentId(node.getParentId());
-                        
+
                         List<AnotherConvertNode> temp = new ArrayList<>(pathNodes);
                         temp.add(anotherConvertNode);
                         anotherConvertNode.setPath(temp.stream().map(AnotherConvertNode::getId).collect(Collectors.joining(",")));
                         return anotherConvertNode;
-                    }, ArrayList::new);
+                    },
+                    ConvertNode::getChildren,
+                    r -> {
+                        r.setChildren(new ArrayList<>());
+                        return r.getChildren();
+                    },
+                    ArrayList::new);
             
             System.out.println(nodes);
         }
@@ -517,8 +532,8 @@ public class TreeUtils {
         
         private static void searchNodeTest() {
             TreeSet<Node> tree = toTreeTest();
-            
-            Node res = searchNode(tree, Node::getChildren, (nodes, node) -> {
+
+            Optional<Node> res = searchNode(tree, Node::getChildren, (nodes, node) -> {
                 System.out.printf("Node [%s] Path nodes: [%s]%n", node.getId(), nodes.stream().map(Node::getId).collect(Collectors.joining("-")));
                 return "A1".equals(node.getId());
             });
