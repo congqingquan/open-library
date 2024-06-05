@@ -6,41 +6,48 @@ import io.jsonwebtoken.Header;
 import io.jsonwebtoken.Jwt;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.vavr.Tuple2;
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.cqq.openlibrary.common.annotation.Nullable;
 
 import javax.crypto.spec.SecretKeySpec;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * JWT工具类(针对于JWT规范下的JWS类别)
+ * 0.11.5 version > JWT工具类(针对于JWT规范下的JWS类别)
  *
  * @author Qingquan.Cong
  */
+@Slf4j
 public class JWSUtils {
 
     @Getter
     @AllArgsConstructor
     public enum TokenStatus {
 
-        /**
-         * 有效：成功解析
-         */
         VALID,
-        /**
-         * 无效：解析失败
-         */
+
         INVALID,
-        /**
-         * 当前时间已大于Token的Payload中的Expiration字段标识的过期时间戳
-         * &&
-         * 过期时间量已经超过 parserBuilder().setAllowedClockSkewSeconds(n) 设定的参数 n
-         */
+
+        // 当前时间已大于Token的Payload中的Expiration字段标识的过期时间戳 && 过期时间量已经超过 parserBuilder().setAllowedClockSkewSeconds(n) 设定的参数 n
         EXPIRED;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ParseResult {
+
+        private TokenStatus tokenStatus;
+
+        private Jwt<Header<?>, Claims> jwt;
     }
 
     /**
@@ -66,7 +73,10 @@ public class JWSUtils {
         return Jwts.builder()
                 .setHeader(header)
                 .setClaims(payload)
+                // It will reset the value of exp attr in payload after call `setExpiration` method
                 .setExpiration(new Date(System.currentTimeMillis() + durationMilliseconds))
+                // Must pass a byte array of secret key in 0.11.5 version, but need to pass a secret key string in 0.9.1 version.
+                // .signWith(signatureAlgorithm, secretKey)
                 .signWith(new SecretKeySpec(secretKey.getBytes(), signatureAlgorithm.getJcaName()))
                 .compact();
     }
@@ -75,80 +85,67 @@ public class JWSUtils {
      * Parse token
      *
      * @param token                   需要解析的 token
-     * @param signatureAlgorithm      签名算法
      * @param secretKey               签名密匙
      * @param allowedClockSkewSeconds 允许偏差的时间戳
      * @return
      */
     public static Jwt<Header<?>, Claims> parse(String token,
-                                               SignatureAlgorithm signatureAlgorithm,
                                                String secretKey,
                                                long allowedClockSkewSeconds) {
         return Jwts.parserBuilder()
-                .setSigningKey(new SecretKeySpec(secretKey.getBytes(), signatureAlgorithm.getJcaName()))
+                // Must pass a byte array of secret key in 0.11.5 version, but need to pass a secret key string in 0.9.1 version.
+                // .signWith(signatureAlgorithm, secretKey)
+                .setSigningKey(secretKey.getBytes())
                 .setAllowedClockSkewSeconds(allowedClockSkewSeconds)
                 .build()
                 .parse(token);
     }
 
     /**
-     * Parse token and get token status
+     * Parse token
      *
      * @param token                   需要解析的 token
-     * @param signatureAlgorithm      签名算法
      * @param secretKey               签名密匙
      * @param allowedClockSkewSeconds 允许偏差的时间戳
      * @return
      */
-    public static Tuple2<TokenStatus, Jwt<Header<?>, Claims>> parseAndGetTokenStatus(String token,
-                                                                                     SignatureAlgorithm signatureAlgorithm,
-                                                                                     String secretKey,
-                                                                                     long allowedClockSkewSeconds) {
-        Jwt<Header<?>, Claims> parse = null;
-        TokenStatus tokenStatus;
+    public static ParseResult parseToken(String token, String secretKey, long allowedClockSkewSeconds) {
+        Jwt<Header<?>, Claims> jtw = null;
+        Exception parseException = null;
+        TokenStatus tokenStatus = TokenStatus.VALID;
         try {
-            parse = parse(token, signatureAlgorithm, secretKey, allowedClockSkewSeconds);
-            tokenStatus = TokenStatus.VALID;
+            jtw = parse(token, secretKey, allowedClockSkewSeconds);
         } catch (ExpiredJwtException exception) {
+            parseException = exception;
             tokenStatus = TokenStatus.EXPIRED;
         } catch (Exception exception) {
+            parseException = exception;
             tokenStatus = TokenStatus.INVALID;
+        } finally {
+            if (parseException != null) {
+                log.error("Parse token failed. Token status [{}]", tokenStatus.name(), parseException);
+            }
         }
-        return new Tuple2<>(tokenStatus, parse);
+        return new ParseResult(tokenStatus, jtw);
     }
 
     /**
-     * Get token status
-     *
+     * Get expiration
      * @param token              需要解析的 token
-     * @param signatureAlgorithm 签名算法
-     * @param secretKey          签名密匙
+     * @param secretKey          签名密匙（对于不同的签名算法有不同的意义）
      * @return
      */
-    public static TokenStatus getTokenStatus(String token, SignatureAlgorithm signatureAlgorithm, String secretKey) {
-        try {
-            parse(token, signatureAlgorithm, secretKey, 0L);
-        } catch (ExpiredJwtException exception) {
-            return TokenStatus.EXPIRED;
-        } catch (Exception exception) {
-            return TokenStatus.INVALID;
+    public static LocalDateTime getExpiration(String token, String secretKey) {
+        ParseResult parseResult = parseToken(token, secretKey, 0L);
+        if (TokenStatus.VALID != parseResult.getTokenStatus()) {
+            throw new IllegalArgumentException(String.format("%s TOKEN", parseResult.getTokenStatus().name()));
         }
-        return TokenStatus.VALID;
+        Date expiration = parseResult.getJwt().getBody().getExpiration();
+        return expiration.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
     }
 
     /**
-     * Token is valid (Parsable and unexpired)
-     *
-     * @param token              需要解析的 token
-     * @param signatureAlgorithm 签名算法
-     * @param secretKey          签名密匙
-     */
-    public static boolean valid(String token, SignatureAlgorithm signatureAlgorithm, String secretKey) {
-        return getTokenStatus(token, signatureAlgorithm, secretKey) == TokenStatus.VALID;
-    }
-
-    /**
-     * Refresh token (Must call valid function before calling refresh function)
+     * Refresh token (Based on current execution time)
      *
      * @param token                需要刷新的 token
      * @param signatureAlgorithm   签名算法
@@ -157,10 +154,11 @@ public class JWSUtils {
      * @return
      */
     public static String refresh(String token, SignatureAlgorithm signatureAlgorithm, String secretKey, long durationMilliseconds) {
-        if (!valid(token, signatureAlgorithm, secretKey)) {
-            throw new IllegalArgumentException("Expired token");
+        ParseResult parseResult = parseToken(token, secretKey, 0L);
+        if (TokenStatus.VALID != parseResult.getTokenStatus()) {
+            throw new IllegalArgumentException(String.format("%s TOKEN", parseResult.getTokenStatus().name()));
         }
-        Jwt<Header<?>, Claims> parseRes = parse(token, signatureAlgorithm, secretKey, 5L);
-        return sign(parseRes.getHeader(), parseRes.getBody(), signatureAlgorithm, secretKey, durationMilliseconds);
+        Jwt<Header<?>, Claims> jwt = parseResult.getJwt();
+        return sign(jwt.getHeader(), jwt.getBody(), signatureAlgorithm, secretKey, durationMilliseconds);
     }
 }

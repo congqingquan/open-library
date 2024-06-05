@@ -1,5 +1,8 @@
 package org.cqq.openlibrary.common.exception;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.cqq.openlibrary.common.domain.R;
 import org.cqq.openlibrary.common.domain.ROption;
@@ -12,9 +15,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;

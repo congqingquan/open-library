@@ -15,6 +15,7 @@ import java.util.function.Supplier;
  *
  * @author Qingquan.Cong
  */
+@Deprecated
 public class BeanUtils {
 
     public static <S, T> T copy(S source, T target) {
