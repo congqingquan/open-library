@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * Collection utils
@@ -49,6 +50,11 @@ public class CollectionUtils {
     @SafeVarargs
     public static <T, C extends Collection<? super T>> C addAll(C coll, T... elements) {
         Collections.addAll(coll, elements);
+        return coll;
+    }
+
+    public static <T, C extends Collection<? super T>> C addAll(C coll, Collection<? extends T> elements) {
+        coll.addAll(elements);
         return coll;
     }
 
@@ -92,6 +98,47 @@ public class CollectionUtils {
             deepForeachRecursion(path, downElement, downField, action);
         }
         path.removeLast();
+    }
+
+    public static <T, C extends Collection<T>> Collection<T> intersectionSet(Collection<T> coll,
+                                                                             Collection<T> anotherColl,
+                                                                             Supplier<C> container) {
+        coll = coll == null ? container.get() : coll;
+        anotherColl = anotherColl == null ? container.get() : anotherColl;
+
+        C collector = container.get();
+        for (T element : coll) {
+            if (anotherColl.contains(element)) {
+                collector.add(element);
+            }
+        }
+        return collector;
+    }
+
+    public static <T, C extends Collection<T>> Collection<T> differenceSet(Collection<T> coll,
+                                                                           Collection<T> anotherColl,
+                                                                           boolean withEachOther,
+                                                                           Supplier<C> container) {
+        coll = coll == null ? container.get() : coll;
+        anotherColl = anotherColl == null ? container.get() : anotherColl;
+
+        C collector = container.get();
+        for (T element : coll) {
+            if (!anotherColl.contains(element)) {
+                collector.add(element);
+            }
+        }
+
+        if (!withEachOther) {
+            return collector;
+        }
+
+        for (T element : anotherColl) {
+            if (!coll.contains(element) && !collector.contains(element)) {
+                collector.add(element);
+            }
+        }
+        return collector;
     }
 
     // ====================================== List method ======================================
@@ -143,7 +190,13 @@ public class CollectionUtils {
     }
 
     public static void main(String[] args) {
-        deepForeachTest();
+//        deepForeachTest();
+//        List<Integer> list1 = Arrays.asList(1, 2);
+//        List<Integer> list2 = Arrays.asList(3, 4);
+
+        System.out.println(intersectionSet(Arrays.asList(1, 2, 2), Arrays.asList(2, 4), ArrayList::new));
+        System.out.println(differenceSet(Arrays.asList(1, 2, 2), Arrays.asList(2, 4), false, ArrayList::new));
+        System.out.println(differenceSet(Arrays.asList(1, 2, 2), Arrays.asList(2, 4), true, ArrayList::new));
     }
 
     @Data

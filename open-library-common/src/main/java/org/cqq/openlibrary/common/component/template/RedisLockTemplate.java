@@ -1,7 +1,7 @@
 package org.cqq.openlibrary.common.component.template;
 
 import lombok.AllArgsConstructor;
-import org.cqq.openlibrary.common.func.ThrowableExecution;
+import org.cqq.openlibrary.common.func.CheckedSupplier;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 
@@ -26,13 +26,13 @@ public class RedisLockTemplate {
      * @param task 执行体
      */
     public <R, LX extends Throwable, TX extends Throwable> R execute(String lockKey, Long waitTime, TimeUnit timeUnit, LX lockFailedException,
-                                                                     ThrowableExecution<R, TX> task) throws LX, TX {
+                                                                     CheckedSupplier<R, TX> task) throws LX, TX {
         RLock lock = redissonClient.getLock(lockKey);
         try {
             if (!lock.tryLock(waitTime, timeUnit)) {
                 throw lockFailedException;
             }
-            return task.execute();
+            return task.get();
         } catch (InterruptedException e) {
             throw lockFailedException;
         } finally {

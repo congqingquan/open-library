@@ -1,5 +1,0 @@
-# Auto Configure
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
- org.cqq.openlibrary.persistence.transaction.SpringTransactionHelper,\
- org.cqq.openlibrary.persistence.template.SpringTransactionTemplate,\
- org.cqq.openlibrary.persistence.template.RedisLockSpringTransactionTemplate

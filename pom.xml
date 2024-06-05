@@ -11,8 +11,6 @@
 
     <modules>
         <module>open-library-common</module>
-        <module>open-library-web</module>
-        <module>open-library-persistence</module>
     </modules>
 
     <properties>
@@ -22,8 +20,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring-boot.version>2.6.5</spring-boot.version>
     </properties>
-
-
+    
     <dependencyManagement>
         <dependencies>
             <!-- modules -->

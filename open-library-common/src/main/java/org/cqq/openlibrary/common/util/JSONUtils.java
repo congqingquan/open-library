@@ -40,7 +40,7 @@ public class JSONUtils {
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
-    private static <R> R callMapper(CheckedFunction<ObjectMapper, R> function) {
+    private static <R, X extends Throwable> R callMapper(CheckedFunction<ObjectMapper, R, X> function) {
         try {
             return function.apply(mapper);
         } catch (Throwable t) {
