@@ -1,22 +1,20 @@
 package org.cqq.openlibrary.common.util;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 /**
  * Collection utils
@@ -58,7 +56,7 @@ public class CollectionUtils {
         return coll;
     }
 
-    // ====================================== Help method ======================================
+    // ====================================== Helper method ======================================
 
     public static boolean isEmpty(Collection<?> collection) {
         return collection == null || collection.size() == 0;
@@ -100,45 +98,85 @@ public class CollectionUtils {
         path.removeLast();
     }
 
-    public static <T, C extends Collection<T>> Collection<T> intersectionSet(Collection<T> coll,
-                                                                             Collection<T> anotherColl,
-                                                                             Supplier<C> container) {
+    public static <E, C extends Collection<E>> boolean contains(C coll, Predicate<E> containPredicate) {
+        if (isEmpty(coll)) {
+            return false;
+        }
+        for (E element : coll) {
+            if (containPredicate.test(element)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static <T, K, C extends Collection<T>> Collection<T> intersectionSet(Collection<? extends T> coll,
+                                                                                Collection<? extends T> anotherColl,
+                                                                                Function<? super T, ? extends K> compareKey,
+                                                                                Supplier<C> container) {
         coll = coll == null ? container.get() : coll;
         anotherColl = anotherColl == null ? container.get() : anotherColl;
 
+        // swap
+        Collection<? extends T> temp;
+        if (anotherColl.size() < coll.size()) {
+            temp = coll;
+            coll = anotherColl;
+            anotherColl = temp;
+        }
+
+        Map<? extends K, ? extends T> anotherCollMap = anotherColl.stream().collect(Collectors.toMap(compareKey, Function.identity()));
         C collector = container.get();
         for (T element : coll) {
-            if (anotherColl.contains(element)) {
+            if (anotherCollMap.containsKey(compareKey.apply(element))) {
                 collector.add(element);
             }
         }
         return collector;
     }
 
-    public static <T, C extends Collection<T>> Collection<T> differenceSet(Collection<T> coll,
-                                                                           Collection<T> anotherColl,
-                                                                           boolean withEachOther,
-                                                                           Supplier<C> container) {
+    public static <T, K, C extends Collection<T>> Collection<T> differenceSet(Collection<? extends T> coll,
+                                                                              Collection<? extends T> anotherColl,
+                                                                              Function<? super T, ? extends K> compareKey,
+                                                                              boolean compareWithEachOther,
+                                                                              Supplier<C> container) {
+        coll = coll == null ? container.get() : coll;
+        anotherColl = anotherColl == null ? container.get() : anotherColl;
+
+        Map<K, T> collector = new HashMap<>();
+
+        Map<? extends K, ? extends T> anotherCollMap = anotherColl.stream().collect(Collectors.toMap(compareKey, Function.identity()));
+        for (T collElement : coll) {
+            K key = compareKey.apply(collElement);
+            if (anotherCollMap.get(key) == null) {
+                collector.put(key, collElement);
+            }
+        }
+
+        if (!compareWithEachOther) {
+            return collector.values();
+        }
+
+        Map<? extends K, ? extends T> collMap = coll.stream().collect(Collectors.toMap(compareKey, Function.identity()));
+        for (T anotherElement : anotherColl) {
+            K key = compareKey.apply(anotherElement);
+            if (collMap.get(key) == null && !collector.containsKey(key)) {
+                collector.put(key, anotherElement);
+            }
+        }
+        return collector.values();
+    }
+
+    public static <T, C extends Collection<T>> Collection<T> unionSet(Collection<? extends T> coll,
+                                                                      Collection<? extends T> anotherColl,
+                                                                      Supplier<C> container) {
         coll = coll == null ? container.get() : coll;
         anotherColl = anotherColl == null ? container.get() : anotherColl;
 
         C collector = container.get();
-        for (T element : coll) {
-            if (!anotherColl.contains(element)) {
-                collector.add(element);
-            }
-        }
+        collector.addAll(coll);
 
-        if (!withEachOther) {
-            return collector;
-        }
-
-        for (T element : anotherColl) {
-            if (!coll.contains(element) && !collector.contains(element)) {
-                collector.add(element);
-            }
-        }
-        return collector;
+        return CollectionUtils.addAll(collector, anotherColl);
     }
 
     // ====================================== List method ======================================
@@ -187,38 +225,5 @@ public class CollectionUtils {
         }
         T remove = list.remove(removeIndex);
         list.add(insertIndex, remove);
-    }
-
-    public static void main(String[] args) {
-//        deepForeachTest();
-//        List<Integer> list1 = Arrays.asList(1, 2);
-//        List<Integer> list2 = Arrays.asList(3, 4);
-
-        System.out.println(intersectionSet(Arrays.asList(1, 2, 2), Arrays.asList(2, 4), ArrayList::new));
-        System.out.println(differenceSet(Arrays.asList(1, 2, 2), Arrays.asList(2, 4), false, ArrayList::new));
-        System.out.println(differenceSet(Arrays.asList(1, 2, 2), Arrays.asList(2, 4), true, ArrayList::new));
-    }
-
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @Accessors(chain = true)
-    static class DeepForeachNode {
-        private String id;
-        private List<DeepForeachNode> children;
-    }
-
-    private static void deepForeachTest() {
-        DeepForeachNode deepForeachNode = new DeepForeachNode("A", Arrays.asList(
-                new DeepForeachNode("A1", Arrays.asList(
-                        new DeepForeachNode("A11", null),
-                        new DeepForeachNode("A12", null)
-                )),
-                new DeepForeachNode("A2", null)
-        ));
-
-        deepForeach(Collections.singleton(deepForeachNode), DeepForeachNode::getChildren, (path, element) -> {
-            System.out.println();
-        });
     }
 }
