@@ -53,6 +53,7 @@ public class CommonExceptionHandler {
 
     @ExceptionHandler(UnauthenticatedException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ResponseBody
     public R<?> handleUnauthenticatedException(HttpServletRequest request, UnauthenticatedException exception) {
         log.error(getBaseMessage(request, WebServerROption.UNAUTHENTICATED), exception);
         return new R<>(WebServerROption.UNAUTHENTICATED.getCode(), null, exception.getMessage());
@@ -60,6 +61,7 @@ public class CommonExceptionHandler {
 
     @ExceptionHandler(UnauthorizedException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ResponseBody
     public R<?> handleUnauthorizedException(HttpServletRequest request, UnauthenticatedException exception) {
         log.error(getBaseMessage(request, WebServerROption.UNAUTHORIZED), exception);
         return new R<>(WebServerROption.UNAUTHORIZED);
