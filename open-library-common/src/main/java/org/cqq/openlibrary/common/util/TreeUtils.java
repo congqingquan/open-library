@@ -273,6 +273,26 @@ public class TreeUtils {
     }
     
     /**
+     * 搜索所有符合的节点
+     *
+     * @param nodes             节点列表
+     * @param childrenExtractor children 提取器
+     * @param predicate         断言节点
+     */
+    public static <T> List<T> searchAllNode(Collection<? extends T> nodes,
+                                             Function<? super T, Collection<? extends T>> childrenExtractor,
+                                             BiPredicate<LinkedList<? extends T>, ? super T> predicate) {
+        List<T> resultNodes = new ArrayList<>();
+        foreach(nodes, childrenExtractor, (pathNodes, node) -> {
+            boolean test = predicate.test(pathNodes, node);
+            if (test) {
+                resultNodes.add(node);
+            }
+        });
+        return resultNodes;
+    }
+    
+    /**
      * 迭代
      *
      * @param nodes             节点列表
