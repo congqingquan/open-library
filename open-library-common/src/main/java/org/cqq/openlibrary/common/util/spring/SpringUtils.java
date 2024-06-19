@@ -1,6 +1,7 @@
 package org.cqq.openlibrary.common.util.spring;
 
 import org.cqq.openlibrary.common.util.ArrayUtils;
+import org.springframework.aop.framework.AopContext;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.config.ConstructorArgumentValues;
@@ -105,6 +106,17 @@ public class SpringUtils implements ApplicationContextAware, BeanDefinitionRegis
 
     public static Class<?> getType(String name) {
         return applicationContext.getType(name);
+    }
+    
+    public static <T> T getCurrentProxy(Class<T> proxyBeanClass) {
+        try {
+            Object currentProxy = AopContext.currentProxy();
+            if (proxyBeanClass.isAssignableFrom(currentProxy.getClass())) {
+                return proxyBeanClass.cast(currentProxy);
+            }
+        } catch (IllegalStateException ignored) {
+        }
+        return null;
     }
     
     /**

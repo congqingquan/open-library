@@ -1,16 +1,19 @@
 package org.cqq.openlibrary.common.util;
 
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Net utils
  *
  * @author Qingquan.Cong
  */
+@Slf4j
 public class NetUtils {
 
     /**
@@ -45,20 +48,49 @@ public class NetUtils {
 
     /**
      * URL编码
-     * @param str
+     * @param str url string
      * @param convertPlus URL编码后默认空格被转为+号，是否需要再次转换为%20
-     * @return
      */
     public static String URLEncode(String str, boolean convertPlus) {
         String res = "";
-        try {
-            res = URLEncoder.encode(str, StandardCharsets.UTF_8.name());
-            if (convertPlus) {
-                res = res.replace("+", "%20");
-            }
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
+        res = URLEncoder.encode(str, StandardCharsets.UTF_8);
+        if (convertPlus) {
+            res = res.replace("+", "%20");
         }
         return res;
+    }
+    
+    /**
+     * 解析 GET 请求参数
+     * @param uri uri string
+     */
+    public static Map<String, String> parseGetRequestParam(String uri) {
+        if (StringUtils.isBlank(uri)) {
+            return new HashMap<>();
+        }
+        // 以第一个 '?' 为准，后面的所有内容皆为 GET 请求参数
+        int i = uri.indexOf("?");
+        if (i == -1) {
+            return new HashMap<>();
+        }
+        
+        // 截取有效的参数部分
+        uri = uri.substring(uri.indexOf('?') + 1);
+        String[] pairs = uri.split("&");
+        Map<String, String> paramMap = MapUtils.newHashMap(pairs.length);
+        for (String pair : pairs) {
+            String[] pairArr = pair.split("=");
+            // case: key=value
+            if (pairArr.length == 2) {
+                paramMap.put(pairArr[0], pairArr[1]);
+            }
+            // case: key=
+            else if (pairArr.length == 1 && StringUtils.isNotBlank(pairArr[0])) {
+                paramMap.put(pairArr[0], "");
+            } else {
+                log.warn("未能解析的 GET 请求参数对 [{}]", pair);
+            }
+        }
+        return paramMap;
     }
 }
