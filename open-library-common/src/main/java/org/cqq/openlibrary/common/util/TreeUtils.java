@@ -219,7 +219,7 @@ public class TreeUtils {
                                                                                Supplier<C> container) {
         C collector = container.get();
         if (CollectionUtils.isEmpty(nodes) || CollectionUtils.isEmpty(childNodes)) {
-            return null;
+            return collector;
         }
         Map<ID, ? extends T> nodesMap = nodes.stream().collect(Collectors.toMap(idExtractor, Function.identity()));
         Map<ID, ? extends T> searchCacheMap = childNodes.stream().collect(Collectors.toMap(idExtractor, Function.identity()));

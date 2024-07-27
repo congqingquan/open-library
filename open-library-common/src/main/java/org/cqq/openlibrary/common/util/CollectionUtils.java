@@ -3,12 +3,14 @@ package org.cqq.openlibrary.common.util;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
 import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
@@ -44,7 +46,12 @@ public class CollectionUtils {
     public static <T> LinkedHashSet<T> newLinkedHashSet(T... elements) {
         return addAll(new LinkedHashSet<>(elements.length), elements);
     }
-
+    
+    @SafeVarargs
+    public static <T> TreeSet<T> newTreeSet(Comparator<? super T> comparator, T... elements) {
+        return addAll(new TreeSet<>(comparator), elements);
+    }
+    
     @SafeVarargs
     public static <T, C extends Collection<? super T>> C addAll(C coll, T... elements) {
         Collections.addAll(coll, elements);
