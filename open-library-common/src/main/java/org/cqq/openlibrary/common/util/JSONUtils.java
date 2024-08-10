@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import org.cqq.openlibrary.common.constants.Constants;
-import org.cqq.openlibrary.common.func.CheckedFunction;
+import org.cqq.openlibrary.common.func.checked.CheckedFunction;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;

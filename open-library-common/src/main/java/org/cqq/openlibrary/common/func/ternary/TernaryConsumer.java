@@ -1,10 +1,5 @@
-package org.cqq.openlibrary.common.func;
+package org.cqq.openlibrary.common.func.ternary;
 
-/**
- * Ternary consumer
- *
- * @author Qingquan.Cong
- */
 @FunctionalInterface
 public interface TernaryConsumer<T1, T2, T3> {
 

@@ -1,16 +1,23 @@
 package org.cqq.openlibrary.common.util;
 
+import io.vavr.Tuple;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+import lombok.extern.slf4j.Slf4j;
+import org.cqq.openlibrary.common.domain.Pair;
+import org.cqq.openlibrary.common.func.checked.CheckedBiConsumer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -32,6 +39,7 @@ import java.util.stream.Collectors;
  *
  * @author CongQingquan
  */
+@Slf4j
 public class TreeUtils {
     
     private TreeUtils() {
@@ -126,7 +134,7 @@ public class TreeUtils {
         if (CollectionUtils.isEmpty(nodes)) {
             return col;
         }
-
+        
         Deque<T> stack = new LinkedList<>(nodes);
         while (stack.size() > 0) {
             T pop = stack.pop();
@@ -157,7 +165,7 @@ public class TreeUtils {
         if (CollectionUtils.isEmpty(sourceNodes)) {
             return col;
         }
-
+        
         for (T sourceNode : sourceNodes) {
             col.add(
                     convertRecursion(
@@ -202,150 +210,209 @@ public class TreeUtils {
     // ====================================== Search ======================================
     
     /**
-     * 搜索链路上的所有父级节点(若根据 pidExtractor 检测到父级节点同时在 childNodes 中，则该节点会被忽略)
-     *
-     * @param nodes        节点集合
-     * @param childNodes   子节点集合
-     * @param idExtractor  id 提取器 (id & pid同类型)
-     * @param pidExtractor pid 提取器 (id & pid同类型)
-     * @param isTopRoot    顶级根节点断言
-     * @param container    结果容器
-     */
-    public static <T, ID, C extends Collection<? super T>> C searchParentNodes(Collection<? extends T> nodes,
-                                                                               Collection<? extends T> childNodes,
-                                                                               Function<? super T, ID> idExtractor,
-                                                                               Function<? super T, ID> pidExtractor,
-                                                                               Predicate<? super T> isTopRoot,
-                                                                               Supplier<C> container) {
-        C collector = container.get();
-        if (CollectionUtils.isEmpty(nodes) || CollectionUtils.isEmpty(childNodes)) {
-            return collector;
-        }
-        Map<ID, ? extends T> nodesMap = nodes.stream().collect(Collectors.toMap(idExtractor, Function.identity()));
-        Map<ID, ? extends T> searchCacheMap = childNodes.stream().collect(Collectors.toMap(idExtractor, Function.identity()));
-        for (T childNode : childNodes) {
-            searchParentNodesRecursion(nodesMap, searchCacheMap, childNode, idExtractor, pidExtractor, isTopRoot, collector);
-        }
-        return collector;
-    }
-    
-    private static <T, ID, C extends Collection<? super T>> void searchParentNodesRecursion(Map<ID, ? extends T> nodesMap,
-                                                                                            Map<ID, ? extends T> searchCacheMap,
-                                                                                            T node,
-                                                                                            Function<? super T, ID> idExtractor,
-                                                                                            Function<? super T, ID> pidExtractor,
-                                                                                            Predicate<? super T> isTopRoot,
-                                                                                            C collector) {
-        ID pid = pidExtractor.apply(node);
-        T parentNode = nodesMap.get(pid);
-        if (isTopRoot.test(node)) {
-            return;
-        } else if (parentNode == null) {
-            throw new RuntimeException(String.format("No parent node in nodes map. The current node id [%s], parent id [%s]", idExtractor.apply(node), pid));
-        }
-        
-        if (searchCacheMap.get(pid) == null) {
-            collector.add(parentNode);
-        }
-        
-        searchParentNodesRecursion(nodesMap, searchCacheMap, parentNode, idExtractor, pidExtractor, isTopRoot, collector);
-    }
-    
-    /**
-     * 搜索节点
-     *
-     * @param nodes             节点列表
-     * @param childrenExtractor children 提取器
-     * @param predicate         断言节点
-     */
-    public static <T> Optional<T> searchNode(Collection<? extends T> nodes,
-                                          Function<? super T, Collection<? extends T>> childrenExtractor,
-                                          BiPredicate<LinkedList<? extends T>, ? super T> predicate) {
-        AtomicReference<Optional<T>> res = new AtomicReference<>(Optional.empty());
-        breakableForeach(nodes, childrenExtractor, (pathNodes, node) -> {
-            boolean test = predicate.test(pathNodes, node);
-            if (test) {
-                res.set(Optional.ofNullable(node));
-            }
-            return test;
-        });
-        return res.get();
-    }
-    
-    /**
-     * 搜索所有符合的节点
-     *
-     * @param nodes             节点列表
-     * @param childrenExtractor children 提取器
-     * @param predicate         断言节点
-     */
-    public static <T> List<T> searchAllNode(Collection<? extends T> nodes,
-                                             Function<? super T, Collection<? extends T>> childrenExtractor,
-                                             BiPredicate<LinkedList<? extends T>, ? super T> predicate) {
-        List<T> resultNodes = new ArrayList<>();
-        foreach(nodes, childrenExtractor, (pathNodes, node) -> {
-            boolean test = predicate.test(pathNodes, node);
-            if (test) {
-                resultNodes.add(node);
-            }
-        });
-        return resultNodes;
-    }
-    
-    /**
      * 迭代
      *
-     * @param nodes             节点列表
-     * @param childrenExtractor children 提取器
-     * @param consumer          消费节点
+     * @param nodes                    节点列表
+     * @param idExtractor              id 提取器
+     * @param childrenExtractor        children 提取器
+     * @param consumer                 消费节点
+     * @param circularReferenceHandler 循环引用处理器
      */
-    public static <T> void foreach(Collection<? extends T> nodes,
-                                   Function<? super T, Collection<? extends T>> childrenExtractor,
-                                   BiConsumer<LinkedList<? extends T>, ? super T> consumer) {
-        breakableForeach(nodes, childrenExtractor, (pathNodes, node) -> {
+    public static <T, ID, X extends Throwable> void foreach(Collection<? extends T> nodes,
+                                                            Function<? super T, ID> idExtractor,
+                                                            Function<? super T, Collection<? extends T>> childrenExtractor,
+                                                            BiConsumer<LinkedHashMap<ID, ? extends T>, ? super T> consumer,
+                                                            CheckedBiConsumer<LinkedHashMap<ID, ? extends T>, T, X> circularReferenceHandler) throws X {
+        breakableForeach(nodes, idExtractor, childrenExtractor, (pathNodes, node) -> {
             consumer.accept(pathNodes, node);
             return false;
-        });
+        }, circularReferenceHandler);
     }
     
     /**
      * 可中断的迭代(当 consumer 返回 true 时终止迭代)
      *
-     * @param nodes             节点列表
-     * @param childrenExtractor children 提取器
-     * @param consumer          终止断言
+     * @param nodes                    节点列表
+     * @param idExtractor              id 提取器
+     * @param childrenExtractor        children 提取器
+     * @param consumer                 终止断言
+     * @param circularReferenceHandler 循环引用处理器
      */
-    public static <T> void breakableForeach(Collection<? extends T> nodes,
-                                            Function<? super T, Collection<? extends T>> childrenExtractor,
-                                            BiPredicate<LinkedList<? extends T>, ? super T> consumer) {
+    public static <T, ID, X extends Throwable> void breakableForeach(Collection<? extends T> nodes,
+                                                                     Function<? super T, ID> idExtractor,
+                                                                     Function<? super T, Collection<? extends T>> childrenExtractor,
+                                                                     BiFunction<LinkedHashMap<ID, ? extends T>, ? super T, Boolean> consumer,
+                                                                     CheckedBiConsumer<LinkedHashMap<ID, ? extends T>, T, X> circularReferenceHandler) throws X {
         if (CollectionUtils.isEmpty(nodes)) {
             return;
         }
         for (T node : nodes) {
-            if (breakableForeachRecursion(node, new LinkedList<>(), childrenExtractor, consumer)) {
+            if (breakableForeachRecursion(node, idExtractor, childrenExtractor, new LinkedHashMap<>(), consumer, circularReferenceHandler)) {
                 return;
             }
         }
     }
     
-    private static <T> boolean breakableForeachRecursion(T node,
-                                                         LinkedList<T> pathNodes,
-                                                         Function<? super T, Collection<? extends T>> childrenExtractor,
-                                                         BiPredicate<LinkedList<? extends T>, ? super T> consumer) {
-        if (consumer.test(pathNodes, node)) {
+    private static <T, ID, X extends Throwable> boolean breakableForeachRecursion(T node,
+                                                                                  Function<? super T, ID> idExtractor,
+                                                                                  Function<? super T, Collection<? extends T>> childrenExtractor,
+                                                                                  LinkedHashMap<ID, T> pathNodeMap,
+                                                                                  BiFunction<LinkedHashMap<ID, ? extends T>, ? super T, Boolean> consumer,
+                                                                                  CheckedBiConsumer<LinkedHashMap<ID, ? extends T>, T, X> circularReferenceHandler) throws X {
+        // 循环引用检测 (根据主键)
+        ID nid = idExtractor.apply(node);
+        if (pathNodeMap.get(nid) != null) {
+            log.error("Circular reference detected. Path node id [{}], current node id [{}]", pathNodeMap.keySet(), nid);
+            circularReferenceHandler.accept(pathNodeMap, node);
+            return false;
+        }
+        
+        // 消费当前节点
+        if (consumer.apply(pathNodeMap, node)) {
             return true;
         }
+        
+        // 当前节点加入路径
+        pathNodeMap.put(nid, node);
+        
+        // 迭代子节点
         Collection<? extends T> children = childrenExtractor.apply(node);
         if (CollectionUtils.isEmpty(children)) {
             return false;
         }
-        pathNodes.add(node);
         for (T child : children) {
-            if (breakableForeachRecursion(child, pathNodes, childrenExtractor, consumer)) {
+            if (breakableForeachRecursion(child, idExtractor, childrenExtractor, pathNodeMap, consumer, circularReferenceHandler)) {
                 return true;
             }
+            // 迭代其他兄弟节点前，需要将自己在节点路径中移除
+            pathNodeMap.remove(idExtractor.apply(child));
         }
         return false;
+    }
+    
+    /**
+     * 搜索链路上的所有父级节点
+     *
+     * @param nodes            节点集合
+     * @param childNodes       子节点集合
+     * @param idExtractor      id 提取器 (id & pid同类型)
+     * @param pidExtractor     pid 提取器 (id & pid同类型)
+     * @param isTopRoot        顶级根节点断言
+     * @param container        结果容器
+     * @param exceptionHandler 异常处理器
+     */
+    public static <T, ID, C extends Collection<? super T>, X extends Throwable> C searchParentNodes(Collection<? extends T> nodes,
+                                                                                                    Collection<? extends T> childNodes,
+                                                                                                    Function<? super T, ID> idExtractor,
+                                                                                                    Function<? super T, ID> pidExtractor,
+                                                                                                    Predicate<? super T> isTopRoot,
+                                                                                                    Supplier<C> container,
+                                                                                                    CheckedBiConsumer<LinkedHashMap<ID, ? extends T>, T, X> exceptionHandler) throws X {
+        C collector = container.get();
+        if (CollectionUtils.isEmpty(nodes) || CollectionUtils.isEmpty(childNodes)) {
+            return collector;
+        }
+        Map<ID, ? extends T> nodesMap = nodes.stream().collect(Collectors.toMap(idExtractor, Function.identity()));
+        Map<ID, T> addedNodeMap = childNodes.stream().collect(Collectors.toMap(idExtractor, Function.identity()));
+        for (T childNode : childNodes) {
+            searchParentNodesRecursion(
+                    nodesMap, addedNodeMap, new LinkedHashMap<>(),
+                    childNode, idExtractor, pidExtractor, isTopRoot, collector, exceptionHandler
+            );
+        }
+        return collector;
+    }
+    
+    private static <T, ID, C extends Collection<? super T>, X extends Throwable> void searchParentNodesRecursion(Map<ID, ? extends T> nodesMap,
+                                                                                                                 Map<ID, T> addedNodeMap,
+                                                                                                                 LinkedHashMap<ID, T> pathNodeMap,
+                                                                                                                 T node,
+                                                                                                                 Function<? super T, ID> idExtractor,
+                                                                                                                 Function<? super T, ID> pidExtractor,
+                                                                                                                 Predicate<? super T> isTopRoot,
+                                                                                                                 C collector,
+                                                                                                                 CheckedBiConsumer<LinkedHashMap<ID, ? extends T>, T, X> exceptionHandler) throws X {
+        ID pid = pidExtractor.apply(node);
+        T parentNode = nodesMap.get(pid);
+        
+        // 父节点判断
+        // 1. 为根节点则结束递归
+        if (isTopRoot.test(node)) {
+            return;
+        }
+        // 2. 无效的父节点主键，
+        else if (parentNode == null) {
+            log.error("No parent node in nodes map. The current node id [{}], parent id [{}]", idExtractor.apply(node), pid);
+            exceptionHandler.accept(pathNodeMap, node);
+            return;
+        }
+        
+        // 闭环检测
+        if (pathNodeMap.get(pid) != null) {
+            log.error("Circular reference detected. Path node id [{}], current node id [{}]", pathNodeMap.keySet(), idExtractor.apply(node));
+            exceptionHandler.accept(pathNodeMap, node);
+            return;
+        }
+        pathNodeMap.put(pid, parentNode);
+        
+        // 收集父节点
+        if (addedNodeMap.get(pid) == null) {
+            // 1. 收集父节点
+            collector.add(parentNode);
+            // 2. 缓存已添加的父节点，以防重复添加同个父节点
+            addedNodeMap.put(pid, parentNode);
+        }
+        
+        searchParentNodesRecursion(nodesMap, addedNodeMap, pathNodeMap, parentNode, idExtractor, pidExtractor, isTopRoot, collector, exceptionHandler);
+    }
+    
+    /**
+     * 搜索节点
+     *
+     * @param nodes                    节点列表
+     * @param idExtractor              id 提取器
+     * @param childrenExtractor        children 提取器
+     * @param predicate                断言节点
+     * @param circularReferenceHandler 循环引用处理器
+     */
+    public static <T, ID, X extends Throwable> Optional<T> searchNode(Collection<? extends T> nodes,
+                                                                      Function<? super T, ID> idExtractor,
+                                                                      Function<? super T, Collection<? extends T>> childrenExtractor,
+                                                                      BiPredicate<LinkedHashMap<ID, ? extends T>, ? super T> predicate,
+                                                                      CheckedBiConsumer<LinkedHashMap<ID, ? extends T>, T, X> circularReferenceHandler) throws X {
+        AtomicReference<T> res = new AtomicReference<>(null);
+        breakableForeach(nodes, idExtractor, childrenExtractor, (pathNodeMap, node) -> {
+            boolean test = predicate.test(pathNodeMap, node);
+            if (test) {
+                res.set(node);
+            }
+            return test;
+        }, circularReferenceHandler);
+        return Optional.ofNullable(res.get());
+    }
+    
+    /**
+     * 搜索所有符合的节点
+     *
+     * @param nodes                    节点列表
+     * @param idExtractor              id 提取器
+     * @param childrenExtractor        children 提取器
+     * @param predicate                断言节点
+     * @param circularReferenceHandler 循环引用处理器
+     */
+    public static <T, ID, X extends Throwable> List<T> searchAllNode(Collection<? extends T> nodes,
+                                                                     Function<? super T, ID> idExtractor,
+                                                                     Function<? super T, Collection<? extends T>> childrenExtractor,
+                                                                     BiPredicate<LinkedHashMap<ID, ? extends T>, ? super T> predicate,
+                                                                     CheckedBiConsumer<LinkedHashMap<ID, ? extends T>, T, X> circularReferenceHandler) throws X {
+        List<T> resultNodes = new ArrayList<>();
+        foreach(nodes, idExtractor, childrenExtractor, (pathNodes, node) -> {
+            boolean test = predicate.test(pathNodes, node);
+            if (test) {
+                resultNodes.add(node);
+            }
+        }, circularReferenceHandler);
+        return resultNodes;
     }
     
     
@@ -355,11 +422,13 @@ public class TreeUtils {
 //            flatMapTest();
 //            convertTest();
 //            searchParentNodeTest();
-            searchNodeTest();
+            searchParentNodeTest2();
+//            searchNodeTest();
 //            foreachTest();
         }
         
         @Data
+        @Accessors(chain = true)
         static class Node {
             String id;
             String parentId;
@@ -382,7 +451,7 @@ public class TreeUtils {
             
             LinkedList<Node> children = new LinkedList<>();
             children.add(new Node("A1", "A", null));
-            children.add(new Node("A11", "A1", null));
+            children.add(new Node("A11", "A11", null));
             children.add(new Node("A2", "A", null));
             children.add(new Node("B1", "B", null));
             children.add(new Node("C1", "C", null));
@@ -396,7 +465,8 @@ public class TreeUtils {
                     Node::getParentId,
                     (node) -> node.getParentId() == null,
                     Node::getChildren, node -> node.setChildren(new ArrayList<>()),
-                    Comparator.comparing(Node::getId).reversed()
+                    // Comparator.comparing(Node::getId).reversed()
+                    Comparator.comparing(Node::getId)
             );
             System.out.println(tree);
             
@@ -477,7 +547,7 @@ public class TreeUtils {
                         AnotherConvertNode anotherConvertNode = new AnotherConvertNode();
                         anotherConvertNode.setId(node.getId());
                         anotherConvertNode.setParentId(node.getParentId());
-
+                        
                         List<AnotherConvertNode> temp = new ArrayList<>(pathNodes);
                         temp.add(anotherConvertNode);
                         anotherConvertNode.setPath(temp.stream().map(AnotherConvertNode::getId).collect(Collectors.joining(",")));
@@ -520,22 +590,27 @@ public class TreeUtils {
             
             Collection<SearchParentNode> childNodes = Arrays.asList(
                     new SearchParentNode("A11", "A1", null),
+                    new SearchParentNode("A12", "A1", null),
                     new SearchParentNode("B1", "B", null)
             );
             
-            // 1. 所有出缺失的父节点
+            // 1. 所有缺失的父节点
             Collection<SearchParentNode> searchParentNodes = searchParentNodes(
                     nodes,
                     childNodes,
                     SearchParentNode::getId,
                     SearchParentNode::getParentId,
                     node -> node.getParentId() == null,
-                    ArrayList::new);
+                    ArrayList::new,
+                    (pathNodeMap, node) -> {
+                        throw new RuntimeException(String.format("Node [%s] Path nodes: [%s]%n", node.getId(), String.join("-", pathNodeMap.keySet())));
+                    }
+            );
             
             // 2. 汇总
             childNodes = new ArrayList<>(childNodes);
             childNodes.addAll(searchParentNodes);
-            
+
             // 3. 转为树
             TreeSet<SearchParentNode> tree = toTree(
                     childNodes,
@@ -546,34 +621,135 @@ public class TreeUtils {
                     node -> node.setChildren(new ArrayList<>()),
                     Comparator.comparing(SearchParentNode::getId)
             );
-            
             System.out.println(tree);
         }
         
+        private static void searchParentNodeTest2() {
+            // 组装数据
+            SearchParentNode a = new SearchParentNode("A", null, null);
+            
+            SearchParentNode a1 = new SearchParentNode("A1", "A2", null);
+            SearchParentNode a2 = new SearchParentNode("A2", "A1", null);
+            
+            SearchParentNode a11 = new SearchParentNode("A11", "A1", null);
+            SearchParentNode a12 = new SearchParentNode("A21", "A2", null);
+            
+            LinkedList<SearchParentNode> nodes = new LinkedList<>();
+            Collections.addAll(nodes, a, a1, a2);
+            
+            List<SearchParentNode> childNodes = new ArrayList<>();
+            Collections.addAll(childNodes, a11, a12);
+            
+            // 1. 所有缺失的父节点
+            Collection<SearchParentNode> searchParentNodes = searchParentNodes(
+                    nodes,
+                    childNodes,
+                    SearchParentNode::getId,
+                    SearchParentNode::getParentId,
+                    node -> node.getParentId() == null,
+                    ArrayList::new,
+                    (pathNodeMap, node) -> {
+                        throw new RuntimeException(String.format("Node [%s] Path nodes: [%s]%n", node.getId(), String.join("-", pathNodeMap.keySet())));
+                    }
+            );
+            
+            System.out.println(searchParentNodes);
+        }
+        
         private static void searchNodeTest() {
-            TreeSet<Node> tree = toTreeTest();
-
-            Optional<Node> res = searchNode(tree, Node::getChildren, (nodes, node) -> {
-                System.out.printf("Node [%s] Path nodes: [%s]%n", node.getId(), nodes.stream().map(Node::getId).collect(Collectors.joining("-")));
-                return "A1".equals(node.getId());
+            // 组装数据
+            LinkedList<Node> tree = new LinkedList<>();
+            Node a = new Node("A", null, null);
+            
+            Node a1 = new Node("A1", "A", null);
+            Node a2 = new Node("A2", "A", null);
+            
+            Node a11 = new Node("A11", "A1", null);
+            Node a12 = new Node("A12", "A1", null);
+            
+            a.children = List.of(a1, a2);
+            a1.children = List.of(a11, a12);
+            
+            // 虽然与父级的 A12 主键相同，但是子节点集合中的各个节点与父节点是不同的，二者不是严格意义上的相同节点。
+            // a12.children = List.of(new Node("A12", "A1", null));
+            
+            // 这种方式，才是严格意义的循环引用!
+            // a12.children = List.of(a12);
+            a12.children = List.of(a1);
+            
+            tree.add(a);
+            
+            //            Optional<Node> res = searchNode(tree, Node::getId, Node::getChildren, (nodes, node) -> {
+            //                System.out.printf(
+            //                        "Node [%s] Path nodes: [%s]%n",
+            //                        node.getId(),
+            //                        String.join("-", nodes.keySet())
+            //                );
+            //                return "A2".equals(node.getId());
+            //            }, (pathNodeMap, node) -> {
+            //                throw new RuntimeException(String.format("Node [%s] Path nodes: [%s]%n", node.getId(), String.join("-", pathNodeMap.keySet())));
+            //            });
+            //            System.out.println(res.orElse(null));
+            
+            List<Node> resList = searchAllNode(tree, Node::getId, Node::getChildren, (nodes, node) -> {
+                System.out.printf(
+                        "Node [%s] Path nodes: [%s]%n",
+                        node.getId(),
+                        String.join("-", nodes.keySet())
+                );
+                return "A2".equals(node.getId());
+            }, (pathNodeMap, node) -> {
+                throw new RuntimeException(String.format("Node [%s] Path nodes: [%s]%n", node.getId(), String.join("-", pathNodeMap.keySet())));
             });
-            System.out.println(res);
+            System.out.println(resList);
         }
         
         private static void foreachTest() {
-            TreeSet<Node> tree = toTreeTest();
+            // 组装数据
+            LinkedList<Node> tree = new LinkedList<>();
+            Node a = new Node("A", null, null);
+            
+            Node a1 = new Node("A1", "A", null);
+            Node a2 = new Node("A2", "A", null);
+            
+            Node a11 = new Node("A11", "A1", null);
+            Node a12 = new Node("A12", "A1", null);
+            
+            a.children = List.of(a1, a2);
+            a1.children = List.of(a11, a12);
+            
+            // 虽然与父级的 A12 主键相同，但是子节点集合中的各个节点与父节点是不同的，二者不是严格意义上的相同节点。
+            // a12.children = List.of(new Node("A12", "A1", null));
+            
+            // 这种方式，才是严格意义的循环引用!
+            // a12.children = List.of(a12);
+            a12.children = List.of(a1);
+            
+            tree.add(a);
             
             System.out.println("======================= foreach =======================");
             
-            foreach(tree, Node::getChildren, (nodes, node) -> {
-                System.out.printf("Node [%s] Path nodes: [%s]%n", node.getId(), nodes.stream().map(Node::getId).collect(Collectors.joining("-")));
+            foreach(tree, Node::getId, Node::getChildren, (nodes, node) -> {
+                System.out.printf(
+                        "Node [%s] Path nodes: [%s]%n",
+                        node.getId(),
+                        String.join("-", nodes.keySet())
+                );
+            }, (pathNodeMap, node) -> {
+                throw new RuntimeException(String.format("Node [%s] Path nodes: [%s]%n", node.getId(), String.join("-", pathNodeMap.keySet())));
             });
             
             System.out.println("======================= breakableForeach =======================");
             
-            breakableForeach(tree, Node::getChildren, (nodes, node) -> {
-                System.out.printf("Node [%s] Path nodes: [%s]%n", node.getId(), nodes.stream().map(Node::getId).collect(Collectors.joining("-")));
-                return "B1".equals(node.getId());
+            breakableForeach(tree, Node::getId, Node::getChildren, (nodes, node) -> {
+                System.out.printf(
+                        "Node [%s] Path nodes: [%s]%n",
+                        node.getId(),
+                        String.join("-", nodes.keySet())
+                );
+                return "A11".equals(node.getId());
+            }, (pathNodeMap, node) -> {
+                System.out.printf("Node [%s] Path nodes: [%s]%n", node.getId(), String.join("-", pathNodeMap.keySet()));
             });
         }
     }

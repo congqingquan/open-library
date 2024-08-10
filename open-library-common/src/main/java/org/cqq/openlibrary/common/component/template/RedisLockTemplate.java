@@ -1,7 +1,7 @@
 package org.cqq.openlibrary.common.component.template;
 
 import lombok.AllArgsConstructor;
-import org.cqq.openlibrary.common.func.CheckedSupplier;
+import org.cqq.openlibrary.common.func.checked.CheckedSupplier;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 

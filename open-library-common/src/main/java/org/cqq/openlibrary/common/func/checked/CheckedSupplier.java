@@ -1,10 +1,5 @@
-package org.cqq.openlibrary.common.func;
+package org.cqq.openlibrary.common.func.checked;
 
-/**
- * Checked supplier
- *
- * @author Qingquan.Cong
- */
 @FunctionalInterface
 public interface CheckedSupplier<R, X extends Throwable> {
 
