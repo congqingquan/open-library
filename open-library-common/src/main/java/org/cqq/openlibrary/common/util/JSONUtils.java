@@ -23,11 +23,11 @@ public class JSONUtils {
     private JSONUtils() {
     }
 
-    private static final ObjectMapper mapper;
+    private static final ObjectMapper MAPPER;
 
     static {
-        mapper = new ObjectMapper();
-        mapper.findAndRegisterModules()
+        MAPPER = new ObjectMapper();
+        MAPPER.findAndRegisterModules()
                 .setTimeZone(SimpleTimeZone.getTimeZone(Constants.TIME_ZONE_GMT_8))
                 .setDateFormat(new SimpleDateFormat(Constants.yyyy_MM_dd_HH_mm_ss))
                 // serialization
@@ -42,18 +42,18 @@ public class JSONUtils {
 
     private static <R, X extends Throwable> R callMapper(CheckedFunction<ObjectMapper, R, X> function) {
         try {
-            return function.apply(mapper);
+            return function.apply(MAPPER);
         } catch (Throwable t) {
             throw new RuntimeException("Parse json string error", t);
         }
     }
 
     public static <T> T parseObject(String jsonObject, Class<T> objectType) {
-        return callMapper(m -> m.readValue(jsonObject, objectType));
+        return callMapper(mapper -> mapper.readValue(jsonObject, objectType));
     }
 
     public static <T> T parseObject(String jsonObject, TypeReference<T> objectType) {
-        return callMapper(m -> m.readValue(jsonObject, objectType));
+        return callMapper(mapper -> mapper.readValue(jsonObject, objectType));
     }
 
     public static <T extends Collection<E>, E> T parseArray(String jsonArray, Supplier<T> collectorSupplier) {
@@ -61,7 +61,7 @@ public class JSONUtils {
         try {
             // 为何不使用 collector.addAll(callMapper(m -> m.readValue(jsonArray, new TypeReference<T>() {}))) ?
             // 因反射无法获取lambda体中的范型类型.
-            collector.addAll(mapper.readValue(jsonArray, new TypeReference<T>() {}));
+            collector.addAll(MAPPER.readValue(jsonArray, new TypeReference<T>() {}));
         } catch (IOException e) {
             throw new RuntimeException("Parse json array string error", e);
         }
@@ -69,6 +69,6 @@ public class JSONUtils {
     }
 
     public static String toJSONString(Object obj) {
-        return callMapper(m -> m.writeValueAsString(obj));
+        return callMapper(mapper -> mapper.writeValueAsString(obj));
     }
 }

@@ -1,13 +1,11 @@
 package org.cqq.openlibrary.common.util;
 
-import io.vavr.Tuple;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
-import org.cqq.openlibrary.common.domain.Pair;
 import org.cqq.openlibrary.common.func.checked.CheckedBiConsumer;
 
 import java.util.ArrayList;
@@ -45,7 +43,7 @@ public class TreeUtils {
     private TreeUtils() {
     }
     
-    // ====================================== Generate ======================================
+    // ====================================== Create ======================================
     
     /**
      * 树化
@@ -406,8 +404,8 @@ public class TreeUtils {
                                                                      BiPredicate<LinkedHashMap<ID, ? extends T>, ? super T> predicate,
                                                                      CheckedBiConsumer<LinkedHashMap<ID, ? extends T>, T, X> circularReferenceHandler) throws X {
         List<T> resultNodes = new ArrayList<>();
-        foreach(nodes, idExtractor, childrenExtractor, (pathNodes, node) -> {
-            boolean test = predicate.test(pathNodes, node);
+        foreach(nodes, idExtractor, childrenExtractor, (pathNodeMap, node) -> {
+            boolean test = predicate.test(pathNodeMap, node);
             if (test) {
                 resultNodes.add(node);
             }

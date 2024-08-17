@@ -1,5 +1,7 @@
 package org.cqq.openlibrary.common.util;
 
+import java.lang.reflect.InvocationTargetException;
+
 /**
  * Reflection utils
  *
@@ -12,8 +14,8 @@ public class ReflectionUtils {
             throw new IllegalArgumentException("Clazz cannot be null");
         }
         try {
-            return clazz.newInstance();
-        } catch (InstantiationException | IllegalAccessException e) {
+            return clazz.getDeclaredConstructor().newInstance();
+        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
             return ExceptionUtils.sneakyThrow(e);
         }
     }
