@@ -19,7 +19,16 @@
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <open-library.version>${version}</open-library.version>
+
         <spring-boot.version>3.0.2</spring-boot.version>
+        <redission.version>3.28.0</redission.version>
+        <mybatis-plus.version>3.5.6</mybatis-plus.version>
+        <jwt.version>0.11.5</jwt.version>
+        <cglib.version>3.3.0</cglib.version>
+        <vavr.version>0.9.0</vavr.version>
+        <lombok.version>1.18.30</lombok.version>
     </properties>
     
     <dependencyManagement>
@@ -28,7 +37,7 @@
             <dependency>
                 <groupId>org.cqq</groupId>
                 <artifactId>open-library-common</artifactId>
-                <version>1.0-SNAPSHOT</version>
+                <version>${open-library.version}</version>
             </dependency>
             
             <!-- springboot -->
@@ -39,12 +48,19 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+
+            <!-- mp -->
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-core</artifactId>
+                <version>${mybatis-plus.version}</version>
+            </dependency>
             
             <!-- redis -->
             <dependency>
                 <groupId>org.redisson</groupId>
                 <artifactId>redisson</artifactId>
-                <version>3.28.0</version>
+                <version>${redission.version}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>org.springframework.boot</groupId>
@@ -55,25 +71,25 @@
             <dependency>
                 <groupId>org.redisson</groupId>
                 <artifactId>redisson-spring-boot-starter</artifactId>
-                <version>3.28.0</version>
+                <version>${redission.version}</version>
             </dependency>
     
             <!-- JWT -->
             <dependency>
                 <groupId>io.jsonwebtoken</groupId>
                 <artifactId>jjwt-api</artifactId>
-                <version>0.11.5</version>
+                <version>${jwt.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.jsonwebtoken</groupId>
                 <artifactId>jjwt-impl</artifactId>
-                <version>0.11.5</version>
+                <version>${jwt.version}</version>
                 <scope>runtime</scope>
             </dependency>
             <dependency>
                 <groupId>io.jsonwebtoken</groupId>
                 <artifactId>jjwt-jackson</artifactId>
-                <version>0.11.5</version>
+                <version>${jwt.version}</version>
                 <scope>runtime</scope>
             </dependency>
             
@@ -81,21 +97,21 @@
             <dependency>
                 <groupId>cglib</groupId>
                 <artifactId>cglib</artifactId>
-                <version>3.3.0</version>
+                <version>${cglib.version}</version>
             </dependency>
             
             <!-- vavr -->
             <dependency>
                 <groupId>io.vavr</groupId>
                 <artifactId>vavr</artifactId>
-                <version>0.9.0</version>
+                <version>${vavr.version}</version>
             </dependency>
     
             <!-- lombok -->
             <dependency>
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
-                <version>1.18.30</version>
+                <version>${lombok.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -110,7 +126,7 @@
                 <configuration>
                     <source>${maven.compiler.source}</source>
                     <target>${maven.compiler.target}</target>
-                    <encoding>UTF-8</encoding>
+                    <encoding>${project.build.sourceEncoding}</encoding>
                     <compilerArgs>
                         <!-- 编译后保留方法形参名称在 Class 中，以便可以反射获取 -->
                         <arg>-parameters</arg>
