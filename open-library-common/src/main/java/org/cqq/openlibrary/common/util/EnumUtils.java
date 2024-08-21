@@ -58,6 +58,10 @@ public class EnumUtils {
         return Optional.empty();
     }
     
+    public static <M, E extends Enum<E>> Optional<E> equalMatchByName(Class<E> enumClass, M matchValue) {
+        return equalMatchByName(enumClass.getEnumConstants(), matchValue);
+    }
+    
     public static <M, E extends Enum<E>> Optional<E> equalMatchByName(E[] enums, M matchValue) {
         for (E enumConstant : enums) {
             if (enumConstant.name().equals(matchValue)) {
