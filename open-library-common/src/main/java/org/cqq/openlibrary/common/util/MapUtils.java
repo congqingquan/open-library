@@ -99,6 +99,10 @@ public class MapUtils {
     
     // ====================================== Search ======================================
     
+    public static boolean isEmpty(Map<?, ?> map) {
+        return map == null || map.isEmpty();
+    }
+    
     // For LinkedHashMap
     public static <V> Optional<V> getFirstKey(Map<?, ? extends V> map) {
         Iterator<? extends V> iterator = map.values().iterator();
