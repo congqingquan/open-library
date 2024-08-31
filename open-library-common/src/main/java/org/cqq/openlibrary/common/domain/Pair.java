@@ -9,9 +9,9 @@ import java.util.Map;
  */
 public class Pair<K, V> implements Map.Entry<K, V> {
     
-    public K key;
+    private K key;
     
-    public V value;
+    private V value;
     
     public Pair() {
     }
