@@ -48,6 +48,19 @@ public class JSONUtils {
         }
     }
 
+    public static boolean isJson(String jsonObject) {
+        return isJson(jsonObject, Object.class);
+    }
+    
+    public static <T> boolean isJson(String jsonObject, Class<T> objectType) {
+        try {
+            callMapper(mapper -> mapper.readValue(jsonObject, objectType));
+            return true;
+        } catch (Throwable e) {
+            return false;
+        }
+    }
+    
     public static <T> T parseObject(String jsonObject, Class<T> objectType) {
         return callMapper(mapper -> mapper.readValue(jsonObject, objectType));
     }
