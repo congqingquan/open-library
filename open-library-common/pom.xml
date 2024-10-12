@@ -6,14 +6,14 @@
         <artifactId>open-library</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-    
+
     <artifactId>open-library-common</artifactId>
     <packaging>jar</packaging>
-    
+
     <name>open-library-common</name>
-    
+
     <dependencies>
-        
+
         <!-- jakarta -->
         <dependency>
             <groupId>jakarta.servlet</groupId>
@@ -23,7 +23,7 @@
             <groupId>jakarta.validation</groupId>
             <artifactId>jakarta.validation-api</artifactId>
         </dependency>
-        
+
         <!-- spring -->
         <dependency>
             <groupId>org.springframework</groupId>
@@ -55,7 +55,7 @@
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-extension</artifactId>
-       </dependency>
+        </dependency>
 
         <!-- redisson -->
         <dependency>
@@ -68,7 +68,7 @@
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
         </dependency>
-        
+
         <!-- JWT -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
@@ -84,23 +84,34 @@
             <artifactId>jjwt-jackson</artifactId>
             <scope>runtime</scope>
         </dependency>
-        
+
         <!-- cglib -->
         <dependency>
             <groupId>cglib</groupId>
             <artifactId>cglib</artifactId>
         </dependency>
-        
+
         <!-- vavr -->
         <dependency>
             <groupId>io.vavr</groupId>
             <artifactId>vavr</artifactId>
         </dependency>
-        
+
         <!-- lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <!-- compile -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+            </plugin>
+        </plugins>
+    </build>
 </project>
