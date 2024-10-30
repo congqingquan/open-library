@@ -11,7 +11,7 @@ import java.util.Arrays;
 /**
  * Serializer: Long[] > String[]
  *
- * @author Qingquan.Cong
+ * @author Qingquan
  */
 public class ArrayLongSerializer extends JsonSerializer<Long[]> {
 

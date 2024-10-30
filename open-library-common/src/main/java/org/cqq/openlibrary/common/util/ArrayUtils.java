@@ -5,7 +5,7 @@ import java.lang.reflect.Array;
 /**
  * Array utils
  *
- * @author Qingquan.Cong
+ * @author Qingquan
  */
 public class ArrayUtils {
 

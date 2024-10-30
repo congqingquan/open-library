@@ -7,7 +7,7 @@ import org.cqq.openlibrary.common.domain.ROption;
 /**
  * Web server response option
  *
- * @author Qingquan.Cong
+ * @author Qingquan
  */
 @Getter
 @AllArgsConstructor

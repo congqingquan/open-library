@@ -7,7 +7,7 @@ import java.util.function.Function;
 /**
  * Object utils
  *
- * @author CongQingquan
+ * @author Qingquan
  */
 public class ObjectUtils {
     

@@ -8,7 +8,7 @@ import java.util.function.Function;
 /**
  * String utils
  *
- * @author Qingquan.Cong
+ * @author Qingquan
  */
 public class StringUtils {
     

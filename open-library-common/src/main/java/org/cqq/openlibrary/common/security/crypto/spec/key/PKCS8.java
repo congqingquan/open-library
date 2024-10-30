@@ -8,7 +8,7 @@ import java.security.spec.PKCS8EncodedKeySpec;
 /**
  * PKCS8 key spec
  *
- * @author CongQingquan
+ * @author Qingquan
  */
 public class PKCS8 {
     

@@ -10,7 +10,7 @@ import java.util.Map;
 /**
  * Default field checker
  *
- * @author Qingquan.Cong
+ * @author Qingquan
  */
 @Component
 public class DefaultModifiedFieldChecker extends ModifiedFieldChecker {

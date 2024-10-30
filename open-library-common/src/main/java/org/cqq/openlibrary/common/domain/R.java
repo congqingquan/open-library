@@ -7,7 +7,7 @@ import lombok.experimental.Accessors;
 /**
  * Response entity
  *
- * @author Qingquan.Cong
+ * @author Qingquan
  */
 @Data
 @Builder(toBuilder = true)

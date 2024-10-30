@@ -3,7 +3,7 @@ package org.cqq.openlibrary.common.exception;
 /**
  * Business exception
  *
- * @author Qingquan.Cong
+ * @author Qingquan
  */
 public class BusinessException extends RuntimeException {
     

@@ -14,7 +14,7 @@ import java.util.function.Supplier;
 /**
  * Map utils
  *
- * @author Qingquan.Cong
+ * @author Qingquan
  */
 public class MapUtils {
     

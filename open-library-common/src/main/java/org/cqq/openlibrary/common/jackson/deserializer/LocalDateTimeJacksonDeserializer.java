@@ -13,7 +13,7 @@ import java.time.format.DateTimeFormatter;
 /**
  * Deserializer: String(yyyy_MM_dd_HH_mm_ss) > LocalDateTime / String(yyyy_MM_dd_HH_mm_ss_SSS) > LocalDateTime
  *
- * @author Qingquan.Cong
+ * @author Qingquan
  */
 public class LocalDateTimeJacksonDeserializer extends JsonDeserializer<LocalDateTime> {
 

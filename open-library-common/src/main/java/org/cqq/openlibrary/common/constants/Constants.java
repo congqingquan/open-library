@@ -5,7 +5,7 @@ import java.util.TimeZone;
 /**
  * Constants
  *
- * @author Qingquan.Cong
+ * @author Qingquan
  */
 public class Constants {
 

@@ -4,3 +4,5 @@ org.cqq.openlibrary.common.util.spring.SpringTransactionHelper
 org.cqq.openlibrary.common.component.template.RedisLockTemplate
 org.cqq.openlibrary.common.component.template.SpringTransactionTemplate
 org.cqq.openlibrary.common.component.template.RedisLockSpringTransactionTemplate
+org.cqq.openlibrary.common.jwt.JWSAuthConfig
+org.cqq.openlibrary.common.jwt.JWSUserUtils

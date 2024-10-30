@@ -3,7 +3,7 @@ package org.cqq.openlibrary.common.domain;
 /**
  * Response option
  *
- * @author Qingquan.Cong
+ * @author Qingquan
  */
 public interface ROption {
     

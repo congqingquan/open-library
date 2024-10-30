@@ -3,22 +3,22 @@ package org.cqq.openlibrary.common.util;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Weight random
  *
+ * <p>
  * Range:    0 ~ 100%
  * Interval: [0, 25%) / [25%, 50%) / [50%, 100%)
+ * </p>
  *
- * @author CongQingquan
+ * @author Qingquan
  */
 public class WeightRandom<T> {
     
@@ -69,34 +69,4 @@ public class WeightRandom<T> {
         SortedMap<Double, T> tailMap = this.weightMap.tailMap(randomWeight, false);
         return this.weightMap.get(tailMap.firstKey());
     }
-    
-    public static void main(String[] args) {
-        LinkedHashMap<Double, String> map = new LinkedHashMap<>();
-        map.put(1.0, "A");
-        map.put(39.0, "B");
-        map.put(60.0, "C");
-        
-        WeightRandom<String> wr = WeightRandom.create(map, false);
-        
-        int total = 100_000;
-        Map<String, Integer> counter = new HashMap<>();
-        for (int i = 0; i < total; i++) {
-            String d = wr.get();
-            if (d == null) {
-                System.err.println("1111");
-            }
-            counter.compute(d, (key, val) ->  {
-                return val == null ? 1 : ++val;
-            });
-        }
-        
-        AtomicInteger tc = new AtomicInteger();
-        counter.forEach((k, v) -> {
-            tc.addAndGet(v);
-            System.out.println(k + " > " + ((double) v / total));
-        });
-        
-        System.out.println(tc.get());
-    }
-    
 }

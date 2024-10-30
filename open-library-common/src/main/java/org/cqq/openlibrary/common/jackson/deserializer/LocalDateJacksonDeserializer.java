@@ -14,7 +14,7 @@ import java.time.format.DateTimeFormatter;
 /**
  * Deserializer: String(yyyy_MM_dd) > LocalDate
  *
- * @author Qingquan.Cong
+ * @author Qingquan
  */
 public class LocalDateJacksonDeserializer extends JsonDeserializer<LocalDate> {
 

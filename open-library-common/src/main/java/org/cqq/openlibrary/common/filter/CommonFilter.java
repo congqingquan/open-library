@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 /**
  * Common filter
  *
- * @author Qingquan.Cong
+ * @author Qingquan
  */
 public class CommonFilter implements Filter {
 

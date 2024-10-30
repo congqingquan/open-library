@@ -8,7 +8,7 @@ import java.security.spec.X509EncodedKeySpec;
 /**
  * X509 key spec
  *
- * @author CongQingquan
+ * @author Qingquan
  */
 public class X509 {
     

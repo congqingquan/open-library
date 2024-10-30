@@ -3,7 +3,7 @@ package org.cqq.openlibrary.common.security;
 /**
  * Verifier
  *
- * @author CongQingquan
+ * @author Qingquan
  */
 public interface Verifier<Sign, Data> {
     

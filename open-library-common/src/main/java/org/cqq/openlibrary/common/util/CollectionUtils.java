@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 /**
  * Collection utils
  *
- * @author Qingquan.Cong
+ * @author Qingquan
  */
 public class CollectionUtils {
 

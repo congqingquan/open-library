@@ -3,7 +3,7 @@ package org.cqq.openlibrary.common.interfaces;
 /**
  * JSON
  *
- * @author Qingquan.Cong
+ * @author Qingquan
  */
 public interface JSON {
 

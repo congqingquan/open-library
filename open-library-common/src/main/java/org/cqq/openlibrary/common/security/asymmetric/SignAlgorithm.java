@@ -6,7 +6,7 @@ import lombok.Getter;
 /**
  * 非对称加密 - 签名算法
  *
- * @author CongQingquan
+ * @author Qingquan
  */
 @Getter
 @AllArgsConstructor

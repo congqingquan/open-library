@@ -1,4 +1,4 @@
-package org.cqq.openlibrary.common.presistent.mybatis.typehandler;
+package org.cqq.openlibrary.common.persistent.mybatis.typehandler;
 
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.MappedTypes;
@@ -19,10 +19,10 @@ import java.sql.SQLException;
  * Need to configuration in application.yml:
  * mybatis-plus:
  *  configuration:
- *   default-enum-type-handler: org.cqq.openlibrary.common.presistent.mybatis.typehandler.EnumTypeHandler
+ *   default-enum-type-handler: org.cqq.openlibrary.common.persistent.mybatis.typehandler.EnumTypeHandler
  * </p>
  *
- * @author CongQingquan
+ * @author Qingquan
  */
 @MappedTypes(Enum.class)
 public class EnumTypeHandler<E extends Enum<E>> implements TypeHandler<E> {

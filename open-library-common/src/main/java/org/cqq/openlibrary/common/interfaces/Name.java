@@ -3,7 +3,7 @@ package org.cqq.openlibrary.common.interfaces;
 /**
  * Name
  *
- * @author Qingquan.Cong
+ * @author Qingquan
  */
 public interface Name {
 

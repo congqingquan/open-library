@@ -5,7 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 /**
  * Reflection utils
  *
- * @author Qingquan.Cong
+ * @author Qingquan
  */
 public class ReflectionUtils {
 

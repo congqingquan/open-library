@@ -8,7 +8,7 @@ import lombok.Getter;
  *
  * @see javax.crypto.Cipher
  *
- * @author CongQingquan
+ * @author Qingquan
  */
 @Getter
 @AllArgsConstructor

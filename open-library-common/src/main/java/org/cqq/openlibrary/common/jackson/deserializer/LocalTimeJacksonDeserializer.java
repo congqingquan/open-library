@@ -14,7 +14,7 @@ import java.time.format.DateTimeFormatter;
 /**
  * Deserializer: String(HH_mm_ss) > LocalTime
  *
- * @author Qingquan.Cong
+ * @author Qingquan
  */
 public class LocalTimeJacksonDeserializer extends JsonDeserializer<LocalTime> {
 

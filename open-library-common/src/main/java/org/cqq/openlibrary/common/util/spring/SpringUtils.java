@@ -19,7 +19,7 @@ import java.util.Map;
 /**
  * Spring utils
  *
- * @author Qingquan.Cong
+ * @author Qingquan
  */
 public class SpringUtils implements ApplicationContextAware, BeanDefinitionRegistryPostProcessor {
     

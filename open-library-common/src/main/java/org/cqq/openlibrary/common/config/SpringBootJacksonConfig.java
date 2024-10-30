@@ -22,7 +22,7 @@ import java.time.LocalTime;
 /**
  * SpringBoot jackson config
  *
- * @author Qingquan.Cong
+ * @author Qingquan
  */
 public class SpringBootJacksonConfig implements Jackson2ObjectMapperBuilderCustomizer {
 

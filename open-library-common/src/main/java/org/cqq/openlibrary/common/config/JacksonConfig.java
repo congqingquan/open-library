@@ -22,7 +22,7 @@ import java.time.LocalTime;
 /**
  * Jackson config
  *
- * @author Qingquan.Cong
+ * @author Qingquan
  */
 public class JacksonConfig {
 

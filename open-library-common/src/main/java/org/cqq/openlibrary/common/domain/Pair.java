@@ -5,7 +5,7 @@ import java.util.Map;
 /**
  * Key value pair
  *
- * @author CongQingquan
+ * @author Qingquan
  */
 public class Pair<K, V> implements Map.Entry<K, V> {
     

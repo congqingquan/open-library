@@ -6,7 +6,7 @@ import lombok.Getter;
 /**
  * 摘要算法
  *
- * @author CongQingquan
+ * @author Qingquan
  */
 @Getter
 @AllArgsConstructor

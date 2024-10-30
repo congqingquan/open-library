@@ -3,7 +3,7 @@ package org.cqq.openlibrary.common.security;
 /**
  * Signer
  *
- * @author CongQingquan
+ * @author Qingquan
  */
 public interface Signer<Data, Sign> {
     

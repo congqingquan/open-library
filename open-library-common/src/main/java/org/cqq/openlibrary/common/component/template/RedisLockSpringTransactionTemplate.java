@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Redis lock & spring transaction template
  *
- * @author Qingquan.Cong
+ * @author Qingquan
  */
 @AllArgsConstructor
 public class RedisLockSpringTransactionTemplate {

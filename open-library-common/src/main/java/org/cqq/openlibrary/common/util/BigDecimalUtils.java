@@ -8,7 +8,7 @@ import java.util.function.Function;
 /**
  * 大浮点工具类
  *
- * @author Qingquan.Cong
+ * @author Qingquan
  */
 public class BigDecimalUtils {
 

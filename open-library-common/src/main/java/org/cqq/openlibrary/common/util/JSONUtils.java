@@ -16,7 +16,7 @@ import java.util.function.Supplier;
 /**
  * JSON utils
  *
- * @author Qingquan.Cong
+ * @author Qingquan
  */
 public class JSONUtils {
 

@@ -16,7 +16,7 @@ import java.util.function.Function;
 /**
  * HTTP request context
  *
- * @author CongQingquan
+ * @author Qingquan
  */
 public class HttpContext {
     

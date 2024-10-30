@@ -14,7 +14,7 @@ import java.util.Objects;
 /**
  * Serializer: LocalDate > String(yyyy_MM_dd)
  *
- * @author Qingquan.Cong
+ * @author Qingquan
  */
 public class LocalDateJacksonSerializer extends JsonSerializer<LocalDate> {
 

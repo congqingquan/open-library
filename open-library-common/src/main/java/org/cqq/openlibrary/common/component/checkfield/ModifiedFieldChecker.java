@@ -17,7 +17,7 @@ import java.util.Map;
 /**
  * Modified field checker
  *
- * @author Qingquan.Cong
+ * @author Qingquan
  */
 @Slf4j
 public abstract class ModifiedFieldChecker {

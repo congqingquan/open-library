@@ -22,13 +22,12 @@ import java.util.stream.Collectors;
 /**
  * Common exception handler
  *
- * @author Qingquan.Cong
+ * @author Qingquan
  */
 @Slf4j
 public class CommonExceptionHandler {
     
-    private static final String LOG_EXCEPTION_FORMAT =
-            "GlobalExceptionHandler: URI [%s], Response code [%s], Message [%s]";
+    private static final String LOG_EXCEPTION_FORMAT = "ExceptionHandler > URI [%s], Response code [%s], Message [%s]";
     
     private String getBaseMessage(HttpServletRequest request, ROption option) {
         return String.format(LOG_EXCEPTION_FORMAT,
@@ -81,24 +80,21 @@ public class CommonExceptionHandler {
     public R<?> handleValidatedException(HttpServletRequest request, Throwable exception) {
         log.error(getBaseMessage(request, WebServerROption.VALIDATED_EXCEPTION), exception);
         // ValidationException 的子类异常 ConstraintViolationException
-        if (exception instanceof ConstraintViolationException) {
+        if (exception instanceof ConstraintViolationException constraintViolationException) {
             /*
              * ConstraintViolationException的e.getMessage()形如: {方法名}.{参数名}: {message} 这里只需要取后面的message即可
              */
-            ConstraintViolationException constraintViolationException = (ConstraintViolationException) exception;
             Set<ConstraintViolation<?>> constraintViolations = constraintViolationException.getConstraintViolations();
             String message = constraintViolations.stream().map(ConstraintViolation::getMessage).collect(Collectors.joining(";"));
             return new R<>(WebServerROption.VALIDATED_EXCEPTION.getCode(), null, message);
         }
         // MethodArgumentNotValidException: BindException 的子类，当接口的请求类型为 application/json 时产生的参数校验异常
-        if (exception instanceof MethodArgumentNotValidException) {
-            MethodArgumentNotValidException methodArgumentNotValidException = (MethodArgumentNotValidException) exception;
+        if (exception instanceof MethodArgumentNotValidException methodArgumentNotValidException) {
             BindingResult bindingResult = methodArgumentNotValidException.getBindingResult();
             return new R<>(WebServerROption.VALIDATED_EXCEPTION.getCode(), null, concatFieldError(bindingResult.getFieldErrors()));
         }
         // BindException: 顶级的参数校验异常
-        else if (exception instanceof BindException) {
-            BindException bindException = (BindException) exception;
+        else if (exception instanceof BindException bindException) {
             BindingResult bindingResult = bindException.getBindingResult();
             return new R<>(WebServerROption.VALIDATED_EXCEPTION.getCode(), null, concatFieldError(bindingResult.getFieldErrors()));
         }

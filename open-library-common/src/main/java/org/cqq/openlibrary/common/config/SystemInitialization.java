@@ -7,7 +7,7 @@ import java.util.TimeZone;
 /**
  * System initialization
  *
- * @author Qingquan.Cong
+ * @author Qingquan
  */
 public class SystemInitialization {
 

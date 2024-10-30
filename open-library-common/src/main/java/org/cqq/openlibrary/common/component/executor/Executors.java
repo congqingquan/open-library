@@ -9,7 +9,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 /**
  * Executors
  *
- * @author Qingquan.Cong
+ * @author Qingquan
  */
 public class Executors {
 

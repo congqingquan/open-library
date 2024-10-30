@@ -3,7 +3,7 @@ package org.cqq.openlibrary.common.security;
 /**
  * Digester
  *
- * @author CongQingquan
+ * @author Qingquan
  */
 public interface Digester<IN_DATA, OUT_DATA> {
     

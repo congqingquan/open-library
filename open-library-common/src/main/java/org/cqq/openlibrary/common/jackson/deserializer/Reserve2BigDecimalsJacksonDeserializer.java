@@ -13,7 +13,7 @@ import java.math.RoundingMode;
 /**
  * Deserializer: String(yyyy_MM_dd) > LocalDate
  *
- * @author Qingquan.Cong
+ * @author Qingquan
  */
 public class Reserve2BigDecimalsJacksonDeserializer extends JsonDeserializer<BigDecimal> {
 

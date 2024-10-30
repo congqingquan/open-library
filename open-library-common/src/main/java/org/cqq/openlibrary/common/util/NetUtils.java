@@ -11,7 +11,7 @@ import java.util.Map;
 /**
  * Net utils
  *
- * @author Qingquan.Cong
+ * @author Qingquan
  */
 @Slf4j
 public class NetUtils {

@@ -1,4 +1,4 @@
-package org.cqq.openlibrary.common.util;
+package org.cqq.openlibrary.common.jwt;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -21,9 +21,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 0.11.5 version > JWT工具类(针对于JWT规范下的JWS类别)
+ * JWT工具类(针对于JWT规范下的JWS类别) > 0.11.5 version
  *
- * @author Qingquan.Cong
+ * @author Qingquan
  */
 @Slf4j
 public class JWSUtils {
@@ -37,7 +37,8 @@ public class JWSUtils {
         INVALID,
 
         // 当前时间已大于Token的Payload中的Expiration字段标识的过期时间戳 && 过期时间量已经超过 parserBuilder().setAllowedClockSkewSeconds(n) 设定的参数 n
-        EXPIRED;
+        EXPIRED
+        ;
     }
 
     @Data
@@ -58,7 +59,6 @@ public class JWSUtils {
      * @param signatureAlgorithm   签名算法
      * @param secretKey            签名密匙（对于不同的签名算法有不同的意义）
      * @param durationMilliseconds 有效时长 (毫秒)
-     * @return
      */
     public static String sign(@Nullable Map<String, Object> header,
                               @Nullable Map<String, Object> payload,
@@ -87,7 +87,6 @@ public class JWSUtils {
      * @param token                   需要解析的 token
      * @param secretKey               签名密匙
      * @param allowedClockSkewSeconds 允许偏差的时间戳
-     * @return
      */
     public static Jwt<Header<?>, Claims> parse(String token,
                                                String secretKey,
@@ -107,7 +106,6 @@ public class JWSUtils {
      * @param token                   需要解析的 token
      * @param secretKey               签名密匙
      * @param allowedClockSkewSeconds 允许偏差的时间戳
-     * @return
      */
     public static ParseResult parseToken(String token, String secretKey, long allowedClockSkewSeconds) {
         Jwt<Header<?>, Claims> jtw = null;
@@ -133,7 +131,6 @@ public class JWSUtils {
      * Get expiration
      * @param token              需要解析的 token
      * @param secretKey          签名密匙（对于不同的签名算法有不同的意义）
-     * @return
      */
     public static LocalDateTime getExpiration(String token, String secretKey) {
         ParseResult parseResult = parseToken(token, secretKey, 0L);
@@ -151,7 +148,6 @@ public class JWSUtils {
      * @param signatureAlgorithm   签名算法
      * @param secretKey            签名密匙（对于不同的签名算法有不同的意义）
      * @param durationMilliseconds 有效时长 (毫秒)
-     * @return
      */
     public static String refresh(String token, SignatureAlgorithm signatureAlgorithm, String secretKey, long durationMilliseconds) {
         ParseResult parseResult = parseToken(token, secretKey, 0L);

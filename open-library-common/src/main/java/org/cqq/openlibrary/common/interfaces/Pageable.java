@@ -3,7 +3,7 @@ package org.cqq.openlibrary.common.interfaces;
 /**
  * Pageable
  *
- * @author Qingquan.Cong
+ * @author Qingquan
  */
 public interface Pageable<T extends Number> {
 

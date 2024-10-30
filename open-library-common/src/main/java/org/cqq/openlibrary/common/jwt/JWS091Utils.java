@@ -1,4 +1,4 @@
-package org.cqq.openlibrary.common.util;
+package org.cqq.openlibrary.common.jwt;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -17,9 +17,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 0.9.1 version > JWT工具类(针对于JWT规范下的JWS类别)
+ * JWT工具类(针对于JWT规范下的JWS类别) > 0.9.1 version
  *
- * @author Qingquan.Cong
+ * @author Qingquan
  */
 public class JWS091Utils {
 
@@ -51,7 +51,6 @@ public class JWS091Utils {
      * @param signatureAlgorithm   签名算法
      * @param secretKey            签名密匙（对于不同的签名算法有不同的意义）
      * @param durationMilliseconds 有效时长 (毫秒)
-     * @return
      */
     public static String sign(@Nullable Map<String, Object> header,
                               @Nullable Map<String, Object> payload,
@@ -78,7 +77,6 @@ public class JWS091Utils {
      * @param signatureAlgorithm      签名算法
      * @param secretKey               签名密匙
      * @param allowedClockSkewSeconds 允许偏差的时间戳
-     * @return
      */
     public static Jwt<Header<?>, Claims> parse(String token,
                                                SignatureAlgorithm signatureAlgorithm,
@@ -98,7 +96,6 @@ public class JWS091Utils {
      * @param signatureAlgorithm      签名算法
      * @param secretKey               签名密匙
      * @param allowedClockSkewSeconds 允许偏差的时间戳
-     * @return
      */
     public static Tuple2<TokenStatus, Jwt<Header<?>, Claims>> parseAndGetTokenStatus(String token,
                                                                                      SignatureAlgorithm signatureAlgorithm,
@@ -123,7 +120,6 @@ public class JWS091Utils {
      * @param token              需要解析的 token
      * @param signatureAlgorithm 签名算法
      * @param secretKey          签名密匙
-     * @return
      */
     public static TokenStatus getTokenStatus(String token, SignatureAlgorithm signatureAlgorithm, String secretKey) {
         try {
@@ -154,7 +150,6 @@ public class JWS091Utils {
      * @param signatureAlgorithm   签名算法
      * @param secretKey            签名密匙（对于不同的签名算法有不同的意义）
      * @param durationMilliseconds 有效时长 (毫秒)
-     * @return
      */
     public static String refresh(String token, SignatureAlgorithm signatureAlgorithm, String secretKey, long durationMilliseconds) {
         if (!valid(token, signatureAlgorithm, secretKey)) {

@@ -6,7 +6,7 @@ import lombok.Getter;
 /**
  * Padding
  *
- * @author CongQingquan
+ * @author Qingquan
  */
 @Getter
 @AllArgsConstructor

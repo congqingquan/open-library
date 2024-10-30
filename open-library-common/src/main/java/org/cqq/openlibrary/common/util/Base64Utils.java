@@ -11,7 +11,7 @@ import java.util.Base64;
 /**
  * Base64 utils
  *
- * @author CongQingquan
+ * @author Qingquan
  */
 public class Base64Utils {
     

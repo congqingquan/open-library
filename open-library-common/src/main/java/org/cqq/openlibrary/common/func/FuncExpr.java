@@ -9,7 +9,7 @@ import java.util.function.Predicate;
 /**
  * Function expression
  *
- * @author Qingquan.Cong
+ * @author Qingquan
  */
 public class FuncExpr {
 

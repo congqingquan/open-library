@@ -6,7 +6,7 @@ import java.security.Key;
 /**
  * Secret key spec
  *
- * @author CongQingquan
+ * @author Qingquan
  */
 public class SecretKey {
     

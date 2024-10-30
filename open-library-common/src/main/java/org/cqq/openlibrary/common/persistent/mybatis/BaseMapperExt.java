@@ -1,4 +1,4 @@
-package org.cqq.openlibrary.common.presistent.mybatis;
+package org.cqq.openlibrary.common.persistent.mybatis;
 
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -19,7 +19,7 @@ import java.util.function.Supplier;
 /**
  * Mybatis base mapper extension
  *
- * @author CongQingquan
+ * @author Qingquan
  */
 public interface BaseMapperExt<T> extends BaseMapper<T> {
     

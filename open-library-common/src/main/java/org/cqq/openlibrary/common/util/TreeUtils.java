@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 /**
  * Tree utils
  *
- * @author CongQingquan
+ * @author Qingquan
  */
 @Slf4j
 public class TreeUtils {

@@ -3,7 +3,7 @@ package org.cqq.openlibrary.common.component.executor;
 /**
  * Executor
  *
- * @author Qingquan.Cong
+ * @author Qingquan
  */
 @FunctionalInterface
 public interface Executor {

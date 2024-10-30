@@ -1,4 +1,4 @@
-package org.cqq.openlibrary.common.presistent.mybatis.typehandler;
+package org.cqq.openlibrary.common.persistent.mybatis.typehandler;
 
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.MappedJdbcTypes;
@@ -17,10 +17,10 @@ import java.util.List;
  * <p>
  * Need to configuration in application.yaml:
  * mybatis-plus:
- *  type-handlers-package: org.cqq.openlibrary.common.presistent.mybatis.typehandler
+ *  type-handlers-package: org.cqq.openlibrary.common.persistent.mybatis.typehandler
  * <p>
  *
- * @author CongQingquan
+ * @author Qingquan
  */
 @MappedJdbcTypes(JdbcType.VARCHAR)
 @MappedTypes(List.class)

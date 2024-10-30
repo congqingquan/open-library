@@ -13,7 +13,7 @@ import java.util.function.Supplier;
 /**
  * Bean utils (Based on CGLIB. Support deep copy) (Cannot work on JDK17)
  *
- * @author Qingquan.Cong
+ * @author Qingquan
  */
 @Deprecated
 public class BeanUtils {

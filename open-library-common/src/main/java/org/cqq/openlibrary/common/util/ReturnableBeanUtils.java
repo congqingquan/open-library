@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 /**
  * Returnable bean utils
  *
- * @author Qingquan.Cong
+ * @author Qingquan
  */
 public class ReturnableBeanUtils {
 

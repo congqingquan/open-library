@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Serializer: List<Long> > String[]
  *
- * @author Qingquan.Cong
+ * @author Qingquan
  */
 public class ListLongSerializer extends JsonSerializer<List<Long>> {
 

@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
 /**
  * Ignore annotation
  *
- * @author Qingquan.Cong
+ * @author Qingquan
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)

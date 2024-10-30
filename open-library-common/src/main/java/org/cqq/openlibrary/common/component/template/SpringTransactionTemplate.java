@@ -14,7 +14,7 @@ import java.util.Set;
 /**
  * Spring transaction template
  *
- * @author Qingquan.Cong
+ * @author Qingquan
  */
 @AllArgsConstructor
 public class SpringTransactionTemplate {

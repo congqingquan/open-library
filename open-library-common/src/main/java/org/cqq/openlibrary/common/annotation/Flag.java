@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
 /**
  * Flag annotation
  *
- * @author Qingquan.Cong
+ * @author Qingquan
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)

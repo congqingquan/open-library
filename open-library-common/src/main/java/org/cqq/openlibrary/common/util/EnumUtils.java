@@ -9,7 +9,7 @@ import java.util.function.Function;
 /**
  * Enum utils
  *
- * @author Qingquan.Cong
+ * @author Qingquan
  */
 public class EnumUtils {
 

@@ -3,7 +3,7 @@ package org.cqq.openlibrary.common.util;
 /**
  * Random utils
  *
- * @author CongQingquan
+ * @author Qingquan
  */
 public class RandomUtils {
     

@@ -3,7 +3,7 @@ package org.cqq.openlibrary.common.exception;
 /**
  * 未认证异常
  *
- * @author Qingquan.Cong
+ * @author Qingquan
  */
 public class UnauthenticatedException  extends RuntimeException {
     

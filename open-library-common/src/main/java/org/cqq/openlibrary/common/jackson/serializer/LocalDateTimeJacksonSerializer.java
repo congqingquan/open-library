@@ -13,7 +13,7 @@ import java.util.Objects;
 /**
  * Serializer: LocalDateTime > String(yyyy_MM_dd_HH_mm_ss)
  *
- * @author Qingquan.Cong
+ * @author Qingquan
  */
 public class LocalDateTimeJacksonSerializer extends JsonSerializer<LocalDateTime> {
 

@@ -8,7 +8,7 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
 /**
  * Spring transaction utils
  *
- * @author Qingquan.Cong
+ * @author Qingquan
  */
 public class SpringTransactionHelper {
 

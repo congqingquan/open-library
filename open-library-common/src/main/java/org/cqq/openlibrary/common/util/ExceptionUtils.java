@@ -3,7 +3,7 @@ package org.cqq.openlibrary.common.util;
 /**
  * Exception utils
  *
- * @author Qingquan.Cong
+ * @author Qingquan
  */
 public class ExceptionUtils {
 

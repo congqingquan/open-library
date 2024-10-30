@@ -12,7 +12,7 @@ import java.util.Objects;
 /**
  * Serializer: BigDecimal(scale: 2, RoundingMode.DOWN).toPlainString() > String
  *
- * @author Qingquan.Cong
+ * @author Qingquan
  */
 public class Reserve2BigDecimalsJacksonSerializer extends JsonSerializer<BigDecimal> {
 
