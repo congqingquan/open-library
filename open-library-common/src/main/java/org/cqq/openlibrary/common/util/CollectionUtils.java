@@ -24,7 +24,10 @@ import java.util.stream.Collectors;
  * @author Qingquan
  */
 public class CollectionUtils {
-
+    
+    private CollectionUtils() {
+    }
+    
     // ====================================== Build method ======================================
 
     @SafeVarargs

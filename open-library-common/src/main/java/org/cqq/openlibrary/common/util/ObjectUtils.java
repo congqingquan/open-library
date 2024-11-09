@@ -2,6 +2,7 @@ package org.cqq.openlibrary.common.util;
 
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
@@ -11,10 +12,22 @@ import java.util.function.Function;
  */
 public class ObjectUtils {
     
-    private ObjectUtils() {}
+    private ObjectUtils() {
+    }
     
+    // Optional.ofNullable(value).orElse(defaultValue)
+    @Deprecated
     public static <T> T defaultIfNull(T obj, T defaultValue) {
         return obj == null ? defaultValue : obj;
+    }
+    
+    // Optional.ofNullable(value).ifPresent(valueConsumer);
+    @Deprecated
+    public static <T> void consumeIfNotNull(T obj, Consumer<T> consumer) {
+        if (obj == null) {
+            return;
+        }
+        consumer.accept(obj);
     }
     
     /**

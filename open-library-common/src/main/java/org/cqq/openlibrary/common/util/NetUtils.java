@@ -7,6 +7,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Net utils
@@ -15,7 +16,10 @@ import java.util.Map;
  */
 @Slf4j
 public class NetUtils {
-
+    
+    private NetUtils() {
+    }
+    
     /**
      * 获取用户真实IP地址，不使用request.getRemoteAddr();的原因是有可能用户使用了代理软件方式避免真实IP地址,
      *
@@ -61,10 +65,20 @@ public class NetUtils {
     }
     
     /**
-     * 解析 GET 请求参数
-     * @param uri uri string
+     * 转为 GET 请求参数 URI
      */
-    public static Map<String, String> parseGetRequestParam(String uri) {
+    public static String toGetRequestParamsUri(Map<String, String> params) {
+        if (MapUtils.isEmpty(params)) {
+            return "";
+        }
+        String paramsStr = params.entrySet().stream().map(entry -> entry.getKey() + "=" + entry.getValue()).collect(Collectors.joining("&"));
+        return "?" + paramsStr;
+    }
+    
+    /**
+     * 解析 GET 请求参数
+     */
+    public static Map<String, String> parseGetRequestParams(String uri) {
         if (StringUtils.isBlank(uri)) {
             return new HashMap<>();
         }
@@ -88,7 +102,7 @@ public class NetUtils {
             else if (pairArr.length == 1 && StringUtils.isNotBlank(pairArr[0])) {
                 paramMap.put(pairArr[0], "");
             } else {
-                log.warn("未能解析的 GET 请求参数对 [{}]", pair);
+                log.error("未能解析的 GET 请求参数对 [{}]", pair);
             }
         }
         return paramMap;

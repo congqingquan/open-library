@@ -6,7 +6,10 @@ package org.cqq.openlibrary.common.util;
  * @author Qingquan
  */
 public class ExceptionUtils {
-
+    
+    private ExceptionUtils() {
+    }
+    
     /**
      * 目的：抹除掉编译型异常必须被处理(try/catch 或 再次向上层抛出)的特性。骗过编译器，实际上在 JVM 处理异常时，对所有类型的异常一视同仁，没有运行时类型、编译型的区分。
      * 原理：

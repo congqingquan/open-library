@@ -7,7 +7,8 @@ package org.cqq.openlibrary.common.util;
  */
 public class RandomUtils {
     
-    private RandomUtils() {}
+    private RandomUtils() {
+    }
     
     // Range > [0, 1)
     public static double randomScaledDecimal(int scale) {

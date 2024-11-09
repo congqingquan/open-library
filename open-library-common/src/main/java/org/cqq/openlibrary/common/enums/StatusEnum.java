@@ -11,6 +11,16 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum StatusEnum {
+    
     NORMAL,
-    DISABLED
+    ABNORMAL,
+    DISABLED,
+    FROZEN,
+    DELETED,
+    
+    SUCCESS,
+    FAILED,
+    PROCESSING,
+    COMPLETED
+    ;
 }

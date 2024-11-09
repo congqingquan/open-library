@@ -12,6 +12,8 @@ import java.util.function.Function;
  */
 public class StringUtils {
     
+    private StringUtils() {
+    }
     
     public static int length(final CharSequence cs) {
         return cs == null ? 0 : cs.length();

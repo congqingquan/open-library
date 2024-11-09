@@ -8,7 +8,10 @@ import java.lang.reflect.InvocationTargetException;
  * @author Qingquan
  */
 public class ReflectionUtils {
-
+    
+    private ReflectionUtils() {
+    }
+    
     public static <T> T newInstance(Class<T> clazz) {
         if (clazz == null) {
             throw new IllegalArgumentException("Clazz cannot be null");

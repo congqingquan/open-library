@@ -22,9 +22,10 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 public class WeightRandom<T> {
     
-    private final TreeMap<Double, T> weightMap = new TreeMap<>();
+    private WeightRandom() {
+    }
     
-    private WeightRandom() {}
+    private final TreeMap<Double, T> weightMap = new TreeMap<>();
     
     public static <T> WeightRandom<T> create(LinkedHashMap<? extends Number, T> weighMap, boolean fair) {
         

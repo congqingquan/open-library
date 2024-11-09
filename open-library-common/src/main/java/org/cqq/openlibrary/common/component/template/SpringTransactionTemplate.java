@@ -21,14 +21,14 @@ public class SpringTransactionTemplate {
 
     private final SpringTransactionHelper springTransactionHelper;
 
-    public final <R, X extends Throwable> void requiredExecute(Collection<Class<? extends Throwable>> rollbackFor,
+    public final <R, X extends Throwable> R requiredExecute(Collection<Class<? extends Throwable>> rollbackFor,
                                                                CheckedSupplier<R, X> task) throws X {
-        execute(TransactionDefinition.ISOLATION_REPEATABLE_READ, TransactionDefinition.PROPAGATION_REQUIRED, rollbackFor, task);
+        return execute(TransactionDefinition.ISOLATION_REPEATABLE_READ, TransactionDefinition.PROPAGATION_REQUIRED, rollbackFor, task);
     }
 
-    public final <R, X extends Throwable> void requiresNewExecute(Collection<Class<? extends Throwable>> rollbackFor,
+    public final <R, X extends Throwable> R requiresNewExecute(Collection<Class<? extends Throwable>> rollbackFor,
                                                                   CheckedSupplier<R, X> task) throws X {
-        execute(TransactionDefinition.ISOLATION_REPEATABLE_READ, TransactionDefinition.PROPAGATION_REQUIRES_NEW, rollbackFor, task);
+        return execute(TransactionDefinition.ISOLATION_REPEATABLE_READ, TransactionDefinition.PROPAGATION_REQUIRES_NEW, rollbackFor, task);
     }
 
     /**

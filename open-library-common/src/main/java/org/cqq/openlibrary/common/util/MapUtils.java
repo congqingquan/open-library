@@ -18,6 +18,9 @@ import java.util.function.Supplier;
  */
 public class MapUtils {
     
+    private MapUtils() {
+    }
+    
     // ====================================== Create ======================================
     
     private static final int MAX_POWER_OF_TWO = 1 << 30;
@@ -100,6 +103,10 @@ public class MapUtils {
     
     public static boolean isEmpty(Map<?, ?> map) {
         return map == null || map.isEmpty();
+    }
+    
+    public static boolean isNotEmpty(Map<?, ?> map) {
+        return !isEmpty(map);
     }
     
     // For LinkedHashMap

@@ -95,6 +95,12 @@
             <artifactId>cglib</artifactId>
         </dependency>
 
+        <!-- okhttp -->
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp</artifactId>
+        </dependency>
+
         <!-- vavr -->
         <dependency>
             <groupId>io.vavr</groupId>
@@ -107,15 +113,4 @@
             <artifactId>lombok</artifactId>
         </dependency>
     </dependencies>
-
-    <build>
-        <plugins>
-            <!-- compile -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
-            </plugin>
-        </plugins>
-    </build>
 </project>

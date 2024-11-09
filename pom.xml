@@ -11,6 +11,7 @@
 
     <modules>
         <module>open-library-common</module>
+        <module>open-library-trade</module>
     </modules>
 
     <properties>
@@ -27,6 +28,7 @@
         <mybatis-plus.version>3.5.6</mybatis-plus.version>
         <jwt.version>0.11.5</jwt.version>
         <cglib.version>3.3.0</cglib.version>
+        <okhttp.version>4.10.0</okhttp.version>
         <vavr.version>0.9.0</vavr.version>
         <lombok.version>1.18.30</lombok.version>
     </properties>
@@ -37,6 +39,11 @@
             <dependency>
                 <groupId>org.cqq</groupId>
                 <artifactId>open-library-common</artifactId>
+                <version>${open-library.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.cqq</groupId>
+                <artifactId>open-library-trade</artifactId>
                 <version>${open-library.version}</version>
             </dependency>
             
@@ -104,7 +111,14 @@
                 <artifactId>cglib</artifactId>
                 <version>${cglib.version}</version>
             </dependency>
-            
+
+            <!-- okhttp -->
+            <dependency>
+                <groupId>com.squareup.okhttp3</groupId>
+                <artifactId>okhttp</artifactId>
+                <version>${okhttp.version}</version>
+            </dependency>
+
             <!-- vavr -->
             <dependency>
                 <groupId>io.vavr</groupId>

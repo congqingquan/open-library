@@ -7,13 +7,14 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.cqq.openlibrary.common.jwt.JWSUserUtils;
 import org.cqq.openlibrary.common.util.ArrayUtils;
 import org.cqq.openlibrary.common.util.HttpContext;
+import org.cqq.openlibrary.common.util.MapUtils;
 import org.cqq.openlibrary.common.util.NetUtils;
 import org.slf4j.MDC;
 import org.springframework.core.StandardReflectionParameterNameDiscoverer;
 
-import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -40,12 +41,12 @@ public class CommonLogAspect {
         String requestIp = NetUtils.getIpAddress(HttpContext.getRequest());
         String className = point.getTarget().getClass().getName();
         String methodName = methodSignature.getName();
-        log.info("用户 [{}] IP [{}] 进入 [{}.{}] 方法 {} 入参:{} {}",
-            userId == null ? "No user id" : userId, requestIp, className, methodName,
-            getLineSeparator(2),
-            requestParamMap,
-            getLineSeparator(0));
-
+        log.info("用户 [{}] IP [{}] 进入 [{}.{}] 方法 {} 入参 [{}] {}",
+                userId == null ? "No user id" : userId, requestIp, className, methodName,
+                getLineSeparator(2),
+                MapUtils.isEmpty(requestParamMap) ? "" : requestParamMap,
+                getLineSeparator(0));
+        
         // 2. 业务方法执行
         // 1) 计时(毫秒)
         long start = System.currentTimeMillis();
@@ -55,53 +56,44 @@ public class CommonLogAspect {
             result = point.proceed();
             // 3. 记录出参
             long totalTimeMillis = System.currentTimeMillis() - start;
-            log.info("用户 [{}] IP [{}] 结束 [{}.{}] 方法调用 耗时 {}ms {} 出参{} {}",
-                userId == null ? "No user id" : userId,
-                requestIp, className, methodName, totalTimeMillis,
-                getLineSeparator(1),
-                result == null ? null : result.toString(),
-                getLineSeparator(1));
+            log.info("用户 [{}] IP [{}] 结束 [{}.{}] 方法调用 耗时 {}ms {} 出参 [{}] {}",
+                    userId == null ? "No user id" : userId,
+                    requestIp, className, methodName, totalTimeMillis,
+                    getLineSeparator(1),
+                    Optional.ofNullable(result).map(Object::toString).orElse(""),
+                    getLineSeparator(1));
         } finally {
             // 4. 清除traceId
             clearTrackId();
         }
         return result;
     }
-
-    /**
-     * 获取请求参数Map
-     */
+    
     private Map<String, Object> getRequestParamMap(ProceedingJoinPoint point, MethodSignature methodSignature) {
         final Map<String, Object> requestParams = new HashMap<>(16);
         Object[] args = point.getArgs();
-        Method method = methodSignature.getMethod();
+        if (ArrayUtils.isEmpty(args)) {
+            return requestParams;
+        }
         StandardReflectionParameterNameDiscoverer parameterNameDiscoverer = new StandardReflectionParameterNameDiscoverer();
-        String[] paramNames = parameterNameDiscoverer.getParameterNames(method);
-        if (ArrayUtils.isNotEmpty(args) && ArrayUtils.isNotEmpty(paramNames)) {
-            for (int i = 0; i < args.length; i++) {
-                requestParams.put(paramNames[i], args[i]);
-            }
+        String[] paramNames = parameterNameDiscoverer.getParameterNames(methodSignature.getMethod());
+        if (paramNames == null) {
+            return requestParams;
+        }
+        for (int i = 0; i < args.length; i++) {
+            requestParams.put(paramNames[i], args[i]);
         }
         return requestParams;
     }
-
-    /**
-     * 获取换行符
-     */
+    
     private String getLineSeparator(Integer count) {
         return String.valueOf(System.lineSeparator()).repeat(Math.max(0, count));
     }
-
-    /**
-     * 设置TraceId
-     */
+    
     private void setTrackId() {
         MDC.put("TraceId", UUID.randomUUID().toString().replace("-", ""));
     }
-
-    /**
-     * 清除TraceId
-     */
+    
     private void clearTrackId() {
         MDC.clear();
     }

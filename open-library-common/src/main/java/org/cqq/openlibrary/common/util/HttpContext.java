@@ -20,30 +20,21 @@ import java.util.function.Function;
  */
 public class HttpContext {
     
-    /**
-     * Get req instance
-     */
+    private HttpContext() {
+    }
+    
     public static HttpServletRequest getRequest() {
         return getServletRequestAttributes().getRequest();
     }
     
-    /**
-     * Get response instance
-     */
     public static HttpServletResponse getResponse() {
         return getServletRequestAttributes().getResponse();
     }
     
-    /**
-     * Get servlet req attributes
-     */
     public static ServletRequestAttributes getServletRequestAttributes() {
         return (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
     }
     
-    /**
-     * Get header names
-     */
     public static List<String> getHeadNames() {
         Enumeration<String> headerNames = getRequest().getHeaderNames();
         List<String> resultList = new ArrayList<>();
@@ -53,9 +44,6 @@ public class HttpContext {
         return resultList;
     }
     
-    /**
-     * Get value of all header
-     */
     public static Map<String, String> getAllHeader() {
         Map<String, String> resultMap = new HashMap<>();
         HttpServletRequest request = getRequest();
@@ -67,10 +55,6 @@ public class HttpContext {
         return resultMap;
     }
     
-    
-    /**
-     * Get multiple value of header
-     */
     public static <T> List<T> getHeaders(String name, Function<String, T> mapping) {
         Enumeration<String> headers = getRequest().getHeaders(name);
         List<T> values = new ArrayList<>();
@@ -79,10 +63,7 @@ public class HttpContext {
         }
         return values;
     }
-    
-    /**
-     * Get multiple value of all header
-     */
+
     public static Map<String, List<String>> getAllHeaders() {
         Map<String, List<String>> resultMap = new HashMap<>();
         HttpServletRequest request = HttpContext.getRequest();
@@ -95,22 +76,16 @@ public class HttpContext {
         return resultMap;
     }
     
-    /**
-     * Get cookie
-     */
     public static Cookie getCookie(String matchName) {
         Cookie[] cookies = getRequest().getCookies();
-        for (int i = 0; i < cookies.length; i++) {
-            if (matchName.equals(cookies[i].getName())) {
-                return cookies[i];
+        for (Cookie cookie : cookies) {
+            if (matchName.equals(cookie.getName())) {
+                return cookie;
             }
         }
         return null;
     }
     
-    /**
-     * Get req domain
-     */
     public static String getRequestDomain() {
         HttpServletRequest request = getRequest();
         StringBuffer requestURL = request.getRequestURL();

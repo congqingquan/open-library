@@ -6,7 +6,7 @@ import java.util.Optional;
 import java.util.function.Function;
 
 /**
- * 大浮点工具类
+ * BigDecimal utils
  *
  * @author Qingquan
  */
@@ -55,5 +55,14 @@ public class BigDecimalUtils {
 
     public static BigDecimal cents2Decimal(Long cents) {
         return new BigDecimal(cents).divide(new BigDecimal(100), 2, RoundingMode.DOWN);
+    }
+    
+    // 浮点转整数分
+    public static Integer decimal2IntegerCents(BigDecimal decimal) {
+        return decimal.multiply(new BigDecimal(100)).toBigInteger().intValue();
+    }
+    
+    public static Long decimal2LongCents(BigDecimal decimal) {
+        return decimal.multiply(new BigDecimal(100)).toBigInteger().longValue();
     }
 }

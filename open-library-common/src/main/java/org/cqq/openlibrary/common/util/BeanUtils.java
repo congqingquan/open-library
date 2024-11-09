@@ -17,7 +17,10 @@ import java.util.function.Supplier;
  */
 @Deprecated
 public class BeanUtils {
-
+    
+    private BeanUtils() {
+    }
+    
     public static <S, T> T copy(S source, T target) {
         if (Objects.isNull(source)) {
             return null;

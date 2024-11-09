@@ -13,7 +13,8 @@ import java.util.stream.Collectors;
  */
 public class ReturnableBeanUtils {
 
-    private ReturnableBeanUtils() {}
+    private ReturnableBeanUtils() {
+    }
 
     public static <S, T> T copyProperties(S source, T target) {
         BeanUtils.copyProperties(source, target);
