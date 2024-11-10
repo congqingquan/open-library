@@ -45,12 +45,21 @@ public class ReturnableBeanUtils {
     }
 
 
-    public static <S, T> Page<T> copyPage(Page<S> page, Page<T> targetPage) {
+    public static <S, T> Page<T> copyPage(Page<S> page, Class<T> targetPage) {
         ArrayList<T> records = new ArrayList<>();
         for (S record : page.getRecords()) {
-            T item = (T) new Object();
-            records.add(copyProperties(record, item));
+            T item = null;
+            try {
+                item = targetPage.newInstance();
+            } catch (InstantiationException e) {
+                throw new RuntimeException(e);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+            copyProperties(record, item);
+            records.add(item);
         }
-        return copyProperties(page, targetPage);
+        Page<T> tPage = copyProperties(page, new Page<T>());
+        return tPage.setRecords(records);
     }
 }
