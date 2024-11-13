@@ -35,7 +35,6 @@ public class OkHttpUtils {
     static {
         // default config
         client = new OkHttpClient.Builder()
-                .retryOnConnectionFailure(false)
                 .connectTimeout(10L, TimeUnit.SECONDS)
                 .readTimeout(10L, TimeUnit.SECONDS)
                 .writeTimeout(10L, TimeUnit.SECONDS)

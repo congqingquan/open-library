@@ -69,7 +69,7 @@ public class CollectionUtils {
     // ====================================== Helper method ======================================
 
     public static boolean isEmpty(Collection<?> collection) {
-        return collection == null || collection.size() == 0;
+        return collection == null || collection.isEmpty();
     }
 
     public static boolean isNotEmpty(Collection<?> collection) {

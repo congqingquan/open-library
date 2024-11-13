@@ -16,18 +16,34 @@ public class ObjectUtils {
     }
     
     // Optional.ofNullable(value).orElse(defaultValue)
-    @Deprecated
     public static <T> T defaultIfNull(T obj, T defaultValue) {
         return obj == null ? defaultValue : obj;
     }
     
     // Optional.ofNullable(value).ifPresent(valueConsumer);
-    @Deprecated
     public static <T> void consumeIfNotNull(T obj, Consumer<T> consumer) {
         if (obj == null) {
             return;
         }
         consumer.accept(obj);
+    }
+    
+    public static boolean anyNull(Object... objs) {
+        for (Object obj : objs) {
+            if (obj == null) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public static boolean allNotNull(Object... objs) {
+        for (Object obj : objs) {
+            if (obj == null) {
+                return false;
+            }
+        }
+        return true;
     }
     
     /**

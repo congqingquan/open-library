@@ -24,15 +24,19 @@ import java.util.Optional;
 public class JWSUserUtils {
 
     private static JWSAuthConfig jwsAuthConfig;
-
-
-    public JWSUserUtils(JWSAuthConfig jwsAuthConfig) {
+    
+    public static void setJwsAuthConfig(JWSAuthConfig jwsAuthConfig) {
         JWSUserUtils.jwsAuthConfig = jwsAuthConfig;
+    }
+    
+    public static JWSAuthConfig getJwsAuthConfig() {
+        return JWSUserUtils.jwsAuthConfig;
     }
     
     /**
      * ============================== Return nullable value function ==============================
      */
+    
     public static @Nullable Long getNullableUserIdLong() {
         return getNullableUserId(Long.class);
     }
