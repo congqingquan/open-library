@@ -1,4 +1,4 @@
-package org.cqq.openlibrary.payment.alipay.exception;
+package org.cqq.openlibrary.common.exception;
 
 /**
  * 支付宝异常

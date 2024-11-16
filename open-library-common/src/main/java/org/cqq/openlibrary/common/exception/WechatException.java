@@ -1,4 +1,4 @@
-package org.cqq.openlibrary.payment.wechat.exception;
+package org.cqq.openlibrary.common.exception;
 
 /**
  * 微信异常

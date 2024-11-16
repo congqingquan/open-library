@@ -7,27 +7,23 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>open-library-trade</artifactId>
+    <artifactId>open-library-notification</artifactId>
     <packaging>jar</packaging>
 
-    <name>open-library-trade</name>
+    <name>open-library-notification</name>
+
 
     <dependencies>
-
         <!-- module -->
         <dependency>
             <groupId>org.cqq</groupId>
             <artifactId>open-library-common</artifactId>
         </dependency>
 
-        <!-- payment sdk -->
+        <!-- notification sdk -->
         <dependency>
-            <groupId>com.github.wechatpay-apiv3</groupId>
-            <artifactId>wechatpay-java</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.alipay.sdk</groupId>
-            <artifactId>alipay-sdk-java-v3</artifactId>
+            <groupId>com.aliyun</groupId>
+            <artifactId>dysmsapi20170525</artifactId>
         </dependency>
     </dependencies>
 </project>

@@ -6,6 +6,7 @@ import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.cqq.openlibrary.common.domain.R;
 import org.cqq.openlibrary.common.domain.ROption;
+import org.cqq.openlibrary.common.domain.WebServerROption;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;

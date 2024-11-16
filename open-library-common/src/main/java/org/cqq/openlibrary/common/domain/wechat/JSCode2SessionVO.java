@@ -1,4 +1,4 @@
-package org.cqq.openlibrary.domain.wechat;
+package org.cqq.openlibrary.common.domain.wechat;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

@@ -1,8 +1,7 @@
-package org.cqq.openlibrary.common.exception;
+package org.cqq.openlibrary.common.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.cqq.openlibrary.common.domain.ROption;
 
 /**
  * Web server response option

@@ -1,11 +1,9 @@
-package org.cqq.openlibrary.util;
+package org.cqq.openlibrary.common.util;
 
 import okhttp3.Response;
 import okhttp3.ResponseBody;
-import org.cqq.openlibrary.common.util.JSONUtils;
-import org.cqq.openlibrary.common.util.OkHttpUtils;
-import org.cqq.openlibrary.domain.wechat.JSCode2SessionVO;
-import org.cqq.openlibrary.payment.wechat.exception.WechatException;
+import org.cqq.openlibrary.common.domain.wechat.JSCode2SessionVO;
+import org.cqq.openlibrary.common.exception.WechatException;
 
 import java.util.Map;
 

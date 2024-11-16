@@ -14,9 +14,13 @@ public enum StatusEnum {
     
     NORMAL,
     ABNORMAL,
+    ENABLED,
     DISABLED,
     FROZEN,
     DELETED,
+    
+    BOUND,
+    UNBOUND,
     
     SUCCESS,
     FAILED,

@@ -12,6 +12,7 @@
     <modules>
         <module>open-library-common</module>
         <module>open-library-trade</module>
+        <module>open-library-notification</module>
     </modules>
 
     <properties>
@@ -35,18 +36,6 @@
     
     <dependencyManagement>
         <dependencies>
-            <!-- modules -->
-            <dependency>
-                <groupId>org.cqq</groupId>
-                <artifactId>open-library-common</artifactId>
-                <version>${open-library.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.cqq</groupId>
-                <artifactId>open-library-trade</artifactId>
-                <version>${open-library.version}</version>
-            </dependency>
-            
             <!-- springboot -->
             <dependency>
                 <groupId>org.springframework.boot</groupId>
@@ -131,6 +120,57 @@
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
                 <version>${lombok.version}</version>
+            </dependency>
+
+            <!-- ============================= modules ============================= -->
+            <dependency>
+                <groupId>org.cqq</groupId>
+                <artifactId>open-library-common</artifactId>
+                <version>${open-library.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.cqq</groupId>
+                <artifactId>open-library-trade</artifactId>
+                <version>${open-library.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.cqq</groupId>
+                <artifactId>open-library-notification</artifactId>
+                <version>${open-library.version}</version>
+            </dependency>
+
+            <!-- ============================= trade ============================= -->
+            <dependency>
+                <groupId>com.github.wechatpay-apiv3</groupId>
+                <artifactId>wechatpay-java</artifactId>
+                <version>0.2.14</version>
+            </dependency>
+            <dependency>
+                <groupId>com.alipay.sdk</groupId>
+                <artifactId>alipay-sdk-java-v3</artifactId>
+                <version>3.1.15.ALL</version>
+            </dependency>
+            <!-- 支付宝通用版 -->
+            <!--
+                <dependency>
+                    <groupId>com.alipay.sdk</groupId>
+                    <artifactId>alipay-sdk-java</artifactId>
+                    <version>4.38.0.ALL</version>
+                </dependency>
+            -->
+
+            <!-- ============================= notification ============================= -->
+            <dependency>
+                <groupId>com.aliyun</groupId>
+                <artifactId>dysmsapi20170525</artifactId>
+                <version>3.0.0</version>
+            </dependency>
+
+            <!-- ============================= oss ============================= -->
+            <dependency>
+                <groupId>com.aliyun.oss</groupId>
+                <artifactId>aliyun-sdk-oss</artifactId>
+                <version>3.15.1</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

@@ -1,4 +1,4 @@
-package org.cqq.openlibrary.enums;
+package org.cqq.openlibrary.trade.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
