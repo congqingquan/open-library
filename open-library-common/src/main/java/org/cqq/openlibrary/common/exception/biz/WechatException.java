@@ -1,11 +1,13 @@
-package org.cqq.openlibrary.common.exception;
+package org.cqq.openlibrary.common.exception.biz;
+
+import org.cqq.openlibrary.common.exception.ExceptionROption;
 
 /**
  * 微信异常
  *
  * @author Qingquan
  */
-public class WechatException extends RuntimeException {
+public class WechatException extends BusinessException {
     
     public WechatException() {
     }
@@ -24,5 +26,9 @@ public class WechatException extends RuntimeException {
     
     public WechatException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
+    }
+    
+    public ExceptionROption getBizExceptionROption() {
+        return ExceptionROption.BIZ_WECHAT_EXCEPTION;
     }
 }

@@ -3,6 +3,7 @@ package org.cqq.openlibrary.common.domain;
 import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.Accessors;
+import org.cqq.openlibrary.common.interfaces.ROption;
 
 /**
  * Response entity

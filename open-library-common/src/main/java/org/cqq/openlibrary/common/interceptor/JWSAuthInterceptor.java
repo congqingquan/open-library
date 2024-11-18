@@ -5,7 +5,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.cqq.openlibrary.common.exception.UnauthenticatedException;
+import org.cqq.openlibrary.common.exception.client.UnauthenticatedException;
 import org.cqq.openlibrary.common.jwt.JWSAuthConfig;
 import org.cqq.openlibrary.common.jwt.JWSUtils;
 import org.cqq.openlibrary.common.util.StringUtils;

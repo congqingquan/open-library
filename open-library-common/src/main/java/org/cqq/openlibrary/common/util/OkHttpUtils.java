@@ -11,7 +11,10 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-import org.cqq.openlibrary.common.exception.NetworkException;
+import okhttp3.ResponseBody;
+import org.cqq.openlibrary.common.exception.server.NetworkException;
+import org.cqq.openlibrary.common.exception.biz.WechatException;
+import org.cqq.openlibrary.common.func.checked.CheckedFunction;
 
 import java.util.HashMap;
 import java.util.List;
@@ -68,20 +71,38 @@ public class OkHttpUtils {
         }
     }
     
+    public static <R> R consumeResponseBodyString(Response response, String apiDesc, CheckedFunction<String, R, ?> checkedFunction) {
+        try (response) {
+            ResponseBody body = response.body();
+            if (body == null) {
+                throw new WechatException("The response body of " + apiDesc + " API is null");
+            }
+            String bodyString = body.string();
+            if (!response.isSuccessful()) {
+                throw new WechatException(apiDesc + " API response isn't successful: " + bodyString);
+            }
+            return checkedFunction.apply(bodyString);
+        } catch (Throwable throwable) {
+            throw new WechatException("Call " + apiDesc + " API failed", throwable);
+        }
+    }
+    
     // ====================================================== GET ======================================================
     
     public static Response get(String url) {
         return get(url, null, null);
     }
     
-    public static Response get(String url, Map<String, String> params) {
-        return get(url, null, params);
+    public static Response get(String url, Map<String, String> urlParams) {
+        return get(url, null, urlParams);
     }
     
-    public static Response get(String url, Map<String, String> headers, Map<String, String> params) {
+    public static Response get(String url,
+                               Map<String, String> headers,
+                               Map<String, String> urlParams) {
         return execute(
                 new Request.Builder()
-                        .url(url + NetUtils.toGetRequestParamsUri(params))
+                        .url(url + NetUtils.toGetRequestParamsUri(urlParams))
                         .headers(Headers.of(Optional.ofNullable(headers).orElse(new HashMap<>())))
                         .build()
         );
@@ -89,15 +110,22 @@ public class OkHttpUtils {
     
     // ====================================================== POST ======================================================
     
-    public static Response postJSON(String url, Map<String, String> headers, Object data) {
-        return post(url, headers, RequestBody.create(JSONUtils.toJSONString(data), APPLICATION_JSON_UTF8_VALUE));
+    public static Response postJSON(String url,
+                                    Map<String, String> headers,
+                                    Map<String, String> urlParams,
+                                    Object data) {
+        return post(url, headers, urlParams, RequestBody.create(JSONUtils.toJSONString(data), APPLICATION_JSON_UTF8_VALUE));
     }
     
-    public static Response postForm(String url, Map<String, String> headers, Map<String, String> params) {
+    public static Response postForm(String url,
+                                    Map<String, String> headers,
+                                    Map<String, String> urlParams,
+                                    Map<String, String> formParams) {
         return post(
                 url,
                 headers,
-                Optional.ofNullable(params)
+                urlParams,
+                Optional.ofNullable(formParams)
                         .map(ps -> {
                             FormBody.Builder formBodyBuilder = new FormBody.Builder();
                             ps.forEach(formBodyBuilder::add);
@@ -109,24 +137,25 @@ public class OkHttpUtils {
     
     /**
      * <p>
-     *      Example:
-     *          File file = new File("/path/file.jpg");
-     *          new MultipartBody.Builder().addFormDataPart("uploadFile", file.getName(), RequestBody.create(file, MediaType.parse("image/png")))
+     * Example:
+     * File file = new File("/path/file.jpg");
+     * new MultipartBody.Builder().addFormDataPart("uploadFile", file.getName(), RequestBody.create(file, MediaType.parse("image/png")))
      * </p>
      *
-     * @param files [formFieldName, filename, RequestBody.create(new File("/path/file.jpg"), MediaType.parse("image/png"))]
+     * @param formParams [formFieldName, filename, RequestBody.create(new File("/path/file.jpg"), MediaType.parse("image/png"))]
      */
     public static Response postMultipartForm(String url,
                                              Map<String, String> headers,
-                                             Map<String, String> params,
-                                             List<Tuple3<String, String, RequestBody>> files) {
+                                             Map<String, String> urlParams,
+                                             Map<String, String> formParams,
+                                             List<Tuple3<String, String, RequestBody>> fileParams) {
         MultipartBody.Builder multipartBodyBuilder = new MultipartBody.Builder();
         // multipart/form-data
         multipartBodyBuilder.setType(MultipartBody.FORM);
-        // 文字段
-        Optional.ofNullable(params).ifPresent(ps -> ps.forEach(multipartBodyBuilder::addFormDataPart));
+        // 表单段
+        Optional.ofNullable(formParams).ifPresent(ps -> ps.forEach(multipartBodyBuilder::addFormDataPart));
         // 文件段
-        Optional.ofNullable(files).ifPresent(fts -> {
+        Optional.ofNullable(fileParams).ifPresent(fts -> {
             if (CollectionUtils.isEmpty(fts)) {
                 return;
             }
@@ -135,13 +164,16 @@ public class OkHttpUtils {
             }
         });
         
-        return post(url, headers, multipartBodyBuilder.build());
+        return post(url, headers, urlParams, multipartBodyBuilder.build());
     }
     
-    public static Response post(String url, Map<String, String> headers, RequestBody requestBody) {
+    public static Response post(String url,
+                                Map<String, String> headers,
+                                Map<String, String> urlParams,
+                                RequestBody requestBody) {
         return execute(
                 new Request.Builder()
-                        .url(url)
+                        .url(url + NetUtils.toGetRequestParamsUri(urlParams))
                         .headers(Headers.of(Optional.ofNullable(headers).orElse(new HashMap<>())))
                         .post(requestBody)
                         .build()

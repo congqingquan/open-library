@@ -1,11 +1,13 @@
-package org.cqq.openlibrary.common.exception;
+package org.cqq.openlibrary.common.exception.biz;
+
+import org.cqq.openlibrary.common.exception.ExceptionROption;
 
 /**
  * 阿里云异常
  *
  * @author Qingquan
  */
-public class AliYunException extends RuntimeException {
+public class AliYunException extends BusinessException {
     
     public AliYunException() {
     }
@@ -24,5 +26,9 @@ public class AliYunException extends RuntimeException {
     
     public AliYunException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
+    }
+    
+    public ExceptionROption getBizExceptionROption() {
+        return ExceptionROption.BIZ_ALI_YUN_EXCEPTION;
     }
 }

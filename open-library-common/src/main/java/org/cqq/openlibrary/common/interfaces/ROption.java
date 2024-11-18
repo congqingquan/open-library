@@ -1,4 +1,4 @@
-package org.cqq.openlibrary.common.domain;
+package org.cqq.openlibrary.common.interfaces;
 
 /**
  * Response option
@@ -10,7 +10,7 @@ public interface ROption {
     ROption SUCCESS = new ROption() {
         @Override
         public Integer getCode() {
-            return 200;
+            return 0;
         }
         
         @Override

@@ -1,11 +1,13 @@
-package org.cqq.openlibrary.common.exception;
+package org.cqq.openlibrary.common.exception.client;
+
+import org.cqq.openlibrary.common.exception.ExceptionROption;
 
 /**
  * 未授权异常
  *
  * @author Qingquan
  */
-public class UnauthorizedException extends RuntimeException {
+public class UnauthorizedException extends ClientException {
     
     public UnauthorizedException() {
     }
@@ -24,5 +26,9 @@ public class UnauthorizedException extends RuntimeException {
     
     public UnauthorizedException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
+    }
+    
+    public ExceptionROption getClientExceptionROption() {
+        return ExceptionROption.CLIENT_UNAUTHORIZED;
     }
 }

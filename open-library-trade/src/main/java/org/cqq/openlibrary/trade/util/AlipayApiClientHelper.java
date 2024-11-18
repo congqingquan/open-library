@@ -9,7 +9,7 @@ import com.alipay.v3.model.AlipaySystemOauthTokenResponseModel;
 import com.alipay.v3.model.AlipayUserInfoShareResponseModel;
 import lombok.extern.slf4j.Slf4j;
 import org.cqq.openlibrary.common.util.JSONUtils;
-import org.cqq.openlibrary.common.exception.AlipayException;
+import org.cqq.openlibrary.common.exception.biz.AlipayException;
 
 /**
  * 支付宝 ApiClient API 工具类

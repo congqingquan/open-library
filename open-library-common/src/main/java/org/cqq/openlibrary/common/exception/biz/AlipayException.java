@@ -1,11 +1,13 @@
-package org.cqq.openlibrary.common.exception;
+package org.cqq.openlibrary.common.exception.biz;
+
+import org.cqq.openlibrary.common.exception.ExceptionROption;
 
 /**
  * 支付宝异常
  *
  * @author Qingquan
  */
-public class AlipayException extends RuntimeException {
+public class AlipayException extends BusinessException {
     
     public AlipayException() {
     }
@@ -24,5 +26,9 @@ public class AlipayException extends RuntimeException {
     
     public AlipayException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
+    }
+    
+    public ExceptionROption getBizExceptionROption() {
+        return ExceptionROption.BIZ_ALIPAY_EXCEPTION;
     }
 }

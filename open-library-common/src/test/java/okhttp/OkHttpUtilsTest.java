@@ -29,6 +29,7 @@ public class OkHttpUtilsTest {
         Response response = OkHttpUtils.postJSON(
                 "http://localhost:9090/api/okhttp/postJSON",
                 Map.of("Token", "CQQ25"),
+                Map.of(),
                 Map.of("name", "CQQ", "age", "25")
         );
         System.out.println(response);
@@ -40,6 +41,7 @@ public class OkHttpUtilsTest {
         Response response = OkHttpUtils.postForm(
                 "http://localhost:9090/api/okhttp/postForm",
                 Map.of("Token", "CQQ25"),
+                Map.of(),
                 Map.of("name", "CQQ", "age", "25")
         );
         System.out.println(response);
@@ -56,6 +58,7 @@ public class OkHttpUtilsTest {
         Response response = OkHttpUtils.postMultipartForm(
                 "http://localhost:9090/api/okhttp/postMultipartForm",
                 Map.of("Token", "CQQ25"),
+                Map.of(),
                 Map.of("name", "CQQ", "age", "25"),
                 List.of(
                         // 表单字段 uploadFile1: [file1, file2]

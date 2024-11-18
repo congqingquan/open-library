@@ -5,7 +5,7 @@ import com.alipay.v3.ApiException;
 import com.alipay.v3.Configuration;
 import com.alipay.v3.util.model.AlipayConfig;
 import org.cqq.openlibrary.common.config.alipay.AlipayCertConfig;
-import org.cqq.openlibrary.common.exception.AlipayException;
+import org.cqq.openlibrary.common.exception.biz.AlipayException;
 
 /**
  * 支付宝转换器

@@ -4,7 +4,7 @@ import com.aliyun.dysmsapi20170525.Client;
 import com.aliyun.teaopenapi.models.Config;
 import org.cqq.openlibrary.common.component.template.ExceptionTemplate;
 import org.cqq.openlibrary.common.config.aliyun.AliYunSMSConfig;
-import org.cqq.openlibrary.common.exception.AliYunException;
+import org.cqq.openlibrary.common.exception.biz.AliYunException;
 
 /**
  * 阿里云转换器
