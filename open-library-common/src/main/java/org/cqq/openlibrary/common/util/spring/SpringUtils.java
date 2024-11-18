@@ -1,6 +1,7 @@
 package org.cqq.openlibrary.common.util.spring;
 
 import org.cqq.openlibrary.common.util.ArrayUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.aop.framework.AopContext;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -23,34 +24,32 @@ import java.util.Map;
  */
 public class SpringUtils implements ApplicationContextAware, BeanDefinitionRegistryPostProcessor {
     
-    private static ApplicationContext applicationContext;
+    private ApplicationContext applicationContext;
 
-    private static Environment environment;
+    private Environment environment;
 
-    private static BeanDefinitionRegistry beanDefinitionRegistry;
+    private BeanDefinitionRegistry beanDefinitionRegistry;
     
     @Override
     public void setApplicationContext(ApplicationContext applicationContext)
         throws BeansException {
-        SpringUtils.applicationContext = applicationContext;
-        SpringUtils.environment = applicationContext.getEnvironment();
+        this.applicationContext = applicationContext;
+        this.environment = applicationContext.getEnvironment();
     }
     
     @Override
-    public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry beanDefinitionRegistry) throws BeansException {
-        SpringUtils.beanDefinitionRegistry = beanDefinitionRegistry;
+    public void postProcessBeanDefinitionRegistry(@NotNull BeanDefinitionRegistry beanDefinitionRegistry) throws BeansException {
+        this.beanDefinitionRegistry = beanDefinitionRegistry;
     }
     
     @Override
-    public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+    public void postProcessBeanFactory(@NotNull ConfigurableListableBeanFactory beanFactory) throws BeansException {
         // Do nothing
     }
     
-    /**
-     * ==================== Registry function ====================
-     */
+    // ======================================== Registry function ========================================
 
-    public static <T> T createBean(String beanName, Class<T> beanClass, Object... constructorArgumentValues) {
+    public <T> T createBean(String beanName, Class<T> beanClass, Object... constructorArgumentValues) {
         GenericBeanDefinition beanDefinition = new GenericBeanDefinition();
         beanDefinition.setBeanClass(beanClass);
         ConstructorArgumentValues argumentValues = new ConstructorArgumentValues();
@@ -62,53 +61,50 @@ public class SpringUtils implements ApplicationContextAware, BeanDefinitionRegis
         return getBean(beanClass);
     }
     
-    /**
-     * ==================== Basic function ====================
-     */
-
-
-    public static Object getBean(String name) {
+    //  ======================================== Basic function ========================================
+    
+    public Object getBean(String name) {
         return applicationContext.getBean(name);
     }
 
 
-    public static <T> T getBean(Class<T> requiredType) {
+    public <T> T getBean(Class<T> requiredType) {
         return applicationContext.getBean(requiredType);
     }
 
-    public static <T> T getBean(String name, Class<T> requiredType) {
+    public <T> T getBean(String name, Class<T> requiredType) {
         return applicationContext.getBean(name, requiredType);
     }
 
-    public static boolean containsBean(String name) {
+    public boolean containsBean(String name) {
         return applicationContext.containsBean(name);
     }
 
-    public static boolean isSingleton(String name) {
+    public boolean isSingleton(String name) {
         return applicationContext.isSingleton(name);
     }
 
-    public static boolean isPrototype(String name) {
+    public boolean isPrototype(String name) {
         return applicationContext.isPrototype(name);
     }
 
-    public static Resource getResource(String location) {
+    public Resource getResource(String location) {
         return applicationContext.getResource(location);
     }
 
-    public static Map<String, Object> getBeansWithAnnotation(Class<? extends Annotation> annotationClass) {
+    public Map<String, Object> getBeansWithAnnotation(Class<? extends Annotation> annotationClass) {
         return applicationContext.getBeansWithAnnotation(annotationClass);
     }
 
-    public static <T> Map<String, T> getBeansOfType(Class<T> typeClass) {
+    public <T> Map<String, T> getBeansOfType(Class<T> typeClass) {
         return applicationContext.getBeansOfType(typeClass);
     }
 
-    public static Class<?> getType(String name) {
+    public Class<?> getType(String name) {
         return applicationContext.getType(name);
     }
     
-    public static <T> T getCurrentProxy(Class<T> proxyBeanClass) {
+    public <T> T getCurrentProxy(Class<T> proxyBeanClass) {
         try {
             Object currentProxy = AopContext.currentProxy();
             if (proxyBeanClass.isAssignableFrom(currentProxy.getClass())) {
@@ -119,19 +115,17 @@ public class SpringUtils implements ApplicationContextAware, BeanDefinitionRegis
         return null;
     }
     
-    /**
-     * ==================== Environment function ====================
-     */
+    // ======================================== Environment function ========================================
 
-    public static String getProperty(String key) {
+    public String getProperty(String key) {
         return environment.getProperty(key);
     }
 
-    public static <T> T getProperty(String key, Class<T> typeClass) {
+    public <T> T getProperty(String key, Class<T> typeClass) {
         return environment.getProperty(key, typeClass);
     }
 
-    public static String currentEnvironment() {
+    public String currentEnvironment() {
         String[] activeProfiles = environment.getActiveProfiles();
         if (ArrayUtils.isEmpty(activeProfiles)) {
             throw new RuntimeException("No environment set");
@@ -139,7 +133,7 @@ public class SpringUtils implements ApplicationContextAware, BeanDefinitionRegis
         return applicationContext.getEnvironment().getActiveProfiles()[0];
     }
 
-    public static boolean inEnvironment(String environment) {
+    public boolean inEnvironment(String environment) {
         return currentEnvironment().equals(environment);
     }
 

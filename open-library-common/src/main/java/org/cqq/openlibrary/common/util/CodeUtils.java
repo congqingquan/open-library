@@ -1,9 +1,13 @@
 package org.cqq.openlibrary.common.util;
 
+import org.cqq.openlibrary.common.component.template.ExceptionTemplate;
 import org.redisson.api.RScript;
 import org.redisson.api.RedissonClient;
-import org.springframework.beans.factory.annotation.Autowired;
 
+import java.net.URI;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
@@ -15,52 +19,31 @@ import java.util.Collections;
  */
 public class CodeUtils {
     
-    // ========================================================= Static =========================================================
-    
-    public static final Integer MAX_PER_SECOND = 9999;
+    private static final Integer MAX_PER_SECOND = 9999;
     
     private static final DateTimeFormatter GEN_CODE_SEQUENCE_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
     
-    /**
-     * if redis.call('hsetnx', KEYS[1], 'count', 1) == 1
-     * then
-     *     redis.call('expire', KEYS[1], ARGV[1]);
-     *     return 1;
-     * else
-     *     local count = tonumber(redis.call('hget', KEYS[1], 'count'));
-     *     redis.call('hmset', KEYS[1], 'count', count + 1);
-     *     return count + 1;
-     * end
-     */
+    // src/main/resources/script/gen-code.lua
     private static final String GEN_CODE_SEQUENCE_LUA =
-            "if redis.call('hsetnx', KEYS[1], 'count', 1) == 1 then redis.call('expire', KEYS[1], ARGV[1]); return 1; " +
-                    "else local count = tonumber(redis.call('hget', KEYS[1], 'count')); redis.call('hmset', KEYS[1], 'count', count + 1); " +
-                    "return count + 1; " +
-                    "end";
+            ExceptionTemplate.execute(
+                    () -> {
+                        URL resource = CodeUtils.class.getResource("/script/gen-code.lua");
+                        if (resource == null) {
+                            throw new RuntimeException("The file '/script/gen-code.lua' non-existent");
+                        }
+                        URI uri = resource.toURI();
+                        return Files.readString(Paths.get(uri));
+                    },
+                    throwable -> new RuntimeException("Cannot read the gen-code.lua file", throwable)
+            );
     
-    // ========================================================= Member =========================================================
-    
-    private final RedissonClient redissonClient;
-    
-    private final String codeSequenceKeyPrefix;
-
-    @Autowired
-    public CodeUtils(RedissonClient redissonClient) {
-        this(redissonClient, "GEN_CODE_SEQUENCE");
-    }
-    
-    public CodeUtils(RedissonClient redissonClient, String codeSequenceKeyPrefix) {
-        this.redissonClient = redissonClient;
-        this.codeSequenceKeyPrefix = codeSequenceKeyPrefix;
-    }
-    
-    public String generate(String type) {
+    public static String generate(RedissonClient redissonClient, String type) {
         String dateTimeNow = GEN_CODE_SEQUENCE_FORMATTER.format(LocalDateTime.now());
         RScript script = redissonClient.getScript();
         Long count = script.eval(
                 RScript.Mode.READ_WRITE, GEN_CODE_SEQUENCE_LUA,
                 RScript.ReturnType.INTEGER,
-                Collections.singletonList(String.join("_", codeSequenceKeyPrefix, dateTimeNow)),
+                Collections.singletonList(String.join("_", "GEN_CODE", type, dateTimeNow)),
                 1
         );
         if (count > MAX_PER_SECOND) {

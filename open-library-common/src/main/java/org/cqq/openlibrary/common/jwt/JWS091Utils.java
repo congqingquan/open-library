@@ -78,6 +78,7 @@ public class JWS091Utils {
      * @param secretKey               签名密匙
      * @param allowedClockSkewSeconds 允许偏差的时间戳
      */
+    @SuppressWarnings({"unchecked"})
     public static Jwt<Header<?>, Claims> parse(String token,
                                                SignatureAlgorithm signatureAlgorithm,
                                                String secretKey,

@@ -4,12 +4,11 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Header;
 import io.jsonwebtoken.Jwt;
 import lombok.extern.slf4j.Slf4j;
+import org.cqq.openlibrary.common.annotation.InitializeStatic;
 import org.cqq.openlibrary.common.annotation.Nullable;
 import org.cqq.openlibrary.common.util.HttpContext;
 import org.cqq.openlibrary.common.util.JSONUtils;
 import org.cqq.openlibrary.common.util.StringUtils;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 
 import java.util.Optional;
 
@@ -19,23 +18,16 @@ import java.util.Optional;
  * @author Qingquan
  */
 @Slf4j
-@ConditionalOnBean(JWSAuthConfig.class)
-@AutoConfigureAfter(JWSAuthConfig.class)
 public class JWSUserUtils {
 
     private static JWSAuthConfig jwsAuthConfig;
     
-    public static void setJwsAuthConfig(JWSAuthConfig jwsAuthConfig) {
-        JWSUserUtils.jwsAuthConfig = jwsAuthConfig;
+    @InitializeStatic
+    public static void init(JWSAuthConfig config) {
+        JWSUserUtils.jwsAuthConfig = config;
     }
     
-    public static JWSAuthConfig getJwsAuthConfig() {
-        return JWSUserUtils.jwsAuthConfig;
-    }
-    
-    /**
-     * ============================== Return nullable value function ==============================
-     */
+    // ============================== Return nullable value function ==============================
     
     public static @Nullable Long getNullableUserIdLong() {
         return getNullableUserId(Long.class);
@@ -49,9 +41,7 @@ public class JWSUserUtils {
         return getUserId(idClass).orElse(null);
     }
     
-    /**
-     * ============================== Return optional function ==============================
-     */
+    // ============================== Return optional function ==============================
     
     public static Optional<Long> getUserIdLong() {
         return getUserId(Long.class);
@@ -84,9 +74,7 @@ public class JWSUserUtils {
         }
     }
     
-    /**
-     * ============================== Return user entity function ==============================
-     */
+    // ============================== Return user entity function ==============================
     
     public static <T> Optional<T> getUser(Class<T> userClass) {
         try {

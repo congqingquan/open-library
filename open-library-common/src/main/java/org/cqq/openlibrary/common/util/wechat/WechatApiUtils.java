@@ -2,7 +2,6 @@ package org.cqq.openlibrary.common.util.wechat;
 
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.Response;
-import org.cqq.openlibrary.common.component.template.RedisLockTemplate;
 import org.cqq.openlibrary.common.exception.biz.WechatException;
 import org.cqq.openlibrary.common.util.JSONUtils;
 import org.cqq.openlibrary.common.util.OkHttpUtils;
@@ -12,6 +11,7 @@ import org.cqq.openlibrary.common.util.wechat.response.GetAccessTokenResponse;
 import org.cqq.openlibrary.common.util.wechat.response.JSCode2SessionResponse;
 import org.cqq.openlibrary.common.util.wechat.response.WechatResponse;
 import org.redisson.api.RBucket;
+import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 
 import java.time.Duration;
@@ -29,18 +29,6 @@ import java.util.concurrent.TimeUnit;
 public class WechatApiUtils {
     
     private WechatApiUtils() {
-    }
-    
-    private static RedissonClient redissonClient;
-    
-    private static RedisLockTemplate redisLockTemplate;
-    
-    public static void setRedissonClient(RedissonClient redissonClient) {
-        WechatApiUtils.redissonClient = redissonClient;
-    }
-    
-    public static void setRedisLockTemplate(RedisLockTemplate redisLockTemplate) {
-        WechatApiUtils.redisLockTemplate = redisLockTemplate;
     }
     
     // ================================================================ Common ================================================================
@@ -97,12 +85,14 @@ public class WechatApiUtils {
         return parseResponse(response, "Get access token", GetAccessTokenResponse.class, checkWechatResponse);
     }
     
-    public static <LX extends Throwable> String getCacheableAccessToken(String appid,
-                                                                        String appSecret) throws LX {
+    public static String getCacheableAccessToken(String appid,
+                                                 String appSecret,
+                                                 RedissonClient redissonClient) {
         return getCacheableAccessToken(
                 appid,
                 appSecret,
                 "KEY_WECHAT_ACCESS_TOKEN",
+                redissonClient,
                 "LOCK_WECHAT_ACCESS_TOKEN",
                 3L,
                 TimeUnit.SECONDS,
@@ -113,47 +103,44 @@ public class WechatApiUtils {
     public static <LX extends Throwable> String getCacheableAccessToken(String appid,
                                                                         String appSecret,
                                                                         String accessTokenKey,
+                                                                        RedissonClient redissonClient,
                                                                         String lockKey,
                                                                         Long waitTime,
                                                                         TimeUnit timeUnit,
                                                                         LX lockFailedException) throws LX {
         
-        if (WechatApiUtils.redissonClient == null) {
-            throw new WechatException("Redisson client hasn't been init");
-        }
-        
-        if (WechatApiUtils.redisLockTemplate == null) {
-            throw new WechatException("Redisson client hasn't been init");
-        }
-        
-        RBucket<String> accessTokenBucket = WechatApiUtils.redissonClient.getBucket(accessTokenKey);
+        RBucket<String> accessTokenBucket = redissonClient.getBucket(accessTokenKey);
         String accessToken = accessTokenBucket.get();
         if (StringUtils.isNotBlank(accessToken)) {
             return accessToken;
         }
         
-        return WechatApiUtils.redisLockTemplate.execute(
-                lockKey,
-                waitTime,
-                timeUnit,
-                lockFailedException,
-                () -> {
-                    
-                    // dcl
-                    String getAgainAccessToken = accessTokenBucket.get();
-                    if (StringUtils.isNotBlank(getAgainAccessToken)) {
-                        return getAgainAccessToken;
-                    }
-                    
-                    // reset token
-                    GetAccessTokenResponse accessTokenResponse = WechatApiUtils.getAccessToken(appid, appSecret, true);
-                    accessTokenBucket.set(
-                            accessTokenResponse.getAccessToken(),
-                            Duration.of(Math.max(accessTokenResponse.getExpiresIn() - 3, 1), ChronoUnit.SECONDS)
-                    );
-                    return accessTokenResponse.getAccessToken();
-                }
-        );
+        RLock lock = redissonClient.getLock(lockKey);
+        try {
+            if (!lock.tryLock(waitTime, timeUnit)) {
+                throw lockFailedException;
+            }
+            
+            // dcl
+            String getAgainAccessToken = accessTokenBucket.get();
+            if (StringUtils.isNotBlank(getAgainAccessToken)) {
+                return getAgainAccessToken;
+            }
+            
+            // reset token
+            GetAccessTokenResponse accessTokenResponse = WechatApiUtils.getAccessToken(appid, appSecret, true);
+            accessTokenBucket.set(
+                    accessTokenResponse.getAccessToken(),
+                    Duration.of(Math.max(accessTokenResponse.getExpiresIn() - 3, 1), ChronoUnit.SECONDS)
+            );
+            return accessTokenResponse.getAccessToken();
+        } catch (InterruptedException e) {
+            throw lockFailedException;
+        } finally {
+            if (lock.isLocked() && lock.isHeldByCurrentThread()) {
+                lock.unlock();
+            }
+        }
     }
     
     // https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/mp-message-management/subscribe-message/sendMessage.html
