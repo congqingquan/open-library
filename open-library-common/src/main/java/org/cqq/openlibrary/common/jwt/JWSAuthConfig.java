@@ -17,6 +17,9 @@ public class JWSAuthConfig {
     @Value("${auth.jws.payload.user-id-key:id}")
     private String userIdPayloadKey;
     
+    @Value("${auth.jws.payload.user-info-key:id}")
+    private String userInfoPayloadKey;
+    
     @Value("${auth.jws.signature-algorithm:HS256}")
     private String signatureAlgorithm;
     
