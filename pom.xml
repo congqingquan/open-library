@@ -31,7 +31,14 @@
         <cglib.version>3.3.0</cglib.version>
         <okhttp.version>4.10.0</okhttp.version>
         <vavr.version>0.9.0</vavr.version>
+        <zxing-core.version>3.4.1</zxing-core.version>
+        <zxing-javase.version>3.4.1</zxing-javase.version>
         <lombok.version>1.18.30</lombok.version>
+
+        <wechatpay-apiv3.version>0.2.14</wechatpay-apiv3.version>
+        <alipay-sdk-java-v3.version>3.1.15.ALL</alipay-sdk-java-v3.version>
+        <aliyun-dysmsapi.version>3.0.0</aliyun-dysmsapi.version>
+        <aliyun-sdk-oss.version>3.15.1</aliyun-sdk-oss.version>
     </properties>
     
     <dependencyManagement>
@@ -114,6 +121,18 @@
                 <artifactId>vavr</artifactId>
                 <version>${vavr.version}</version>
             </dependency>
+
+            <!-- google -->
+            <dependency>
+                <groupId>com.google.zxing</groupId>
+                <artifactId>core</artifactId>
+                <version>${zxing-core.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.zxing</groupId>
+                <artifactId>javase</artifactId>
+                <version>${zxing-javase.version}</version>
+            </dependency>
     
             <!-- lombok -->
             <dependency>
@@ -143,12 +162,12 @@
             <dependency>
                 <groupId>com.github.wechatpay-apiv3</groupId>
                 <artifactId>wechatpay-java</artifactId>
-                <version>0.2.14</version>
+                <version>${wechatpay-apiv3.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.alipay.sdk</groupId>
                 <artifactId>alipay-sdk-java-v3</artifactId>
-                <version>3.1.15.ALL</version>
+                <version>${alipay-sdk-java-v3.version}</version>
             </dependency>
             <!-- 支付宝通用版 -->
             <!--
@@ -163,14 +182,14 @@
             <dependency>
                 <groupId>com.aliyun</groupId>
                 <artifactId>dysmsapi20170525</artifactId>
-                <version>3.0.0</version>
+                <version>${aliyun-dysmsapi.version}</version>
             </dependency>
 
             <!-- ============================= oss ============================= -->
             <dependency>
                 <groupId>com.aliyun.oss</groupId>
                 <artifactId>aliyun-sdk-oss</artifactId>
-                <version>3.15.1</version>
+                <version>${aliyun-sdk-oss.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

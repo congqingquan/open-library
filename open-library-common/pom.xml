@@ -113,6 +113,16 @@
             <artifactId>lombok</artifactId>
         </dependency>
 
+        <!-- google -->
+        <dependency>
+            <groupId>com.google.zxing</groupId>
+            <artifactId>core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.zxing</groupId>
+            <artifactId>javase</artifactId>
+        </dependency>
+
         <!-- hutool -->
         <dependency>
             <groupId>cn.hutool</groupId>

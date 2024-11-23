@@ -15,7 +15,7 @@ import org.cqq.openlibrary.common.interfaces.ROption;
 @Accessors(chain = true)
 public class R<T> {
 	
-	private Integer code;
+	private Long code;
 
 	private T data;
 
@@ -28,7 +28,7 @@ public class R<T> {
 		this.message = option.getMessage();
 	}
 
-	public R(Integer code, T data, String message) {
+	public R(Long code, T data, String message) {
 		super();
 		this.code = code;
 		this.data = data;
@@ -43,7 +43,7 @@ public class R<T> {
 		return new R<>(ROption.SUCCESS.getCode(), data, ROption.SUCCESS.getMessage());
 	}
 	
-	public static <T> R<T> response(Integer code, T data, String message) {
+	public static <T> R<T> response(Long code, T data, String message) {
 		return new R<>(code, data, message);
 	}
 	

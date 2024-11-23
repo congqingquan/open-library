@@ -9,7 +9,7 @@
        - org.cqq.openlibrary.common.util.JSONUtils
     2. 依赖非静态：
        1. 非静态设置为函数参数。如：
-          - org.cqq.openlibrary.common.util.wechat.WechatApiUtils
+          - org.cqq.openlibrary.common.util.wechat.WechatApiSDK
           - org.cqq.openlibrary.common.util.CodeUtils
        2. 应用启动时，手动进行非静态的依赖注入。如：
           - org.cqq.openlibrary.common.jwt.JWSUserUtils

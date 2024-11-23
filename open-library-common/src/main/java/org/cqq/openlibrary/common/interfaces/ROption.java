@@ -9,8 +9,8 @@ public interface ROption {
     
     ROption SUCCESS = new ROption() {
         @Override
-        public Integer getCode() {
-            return 0;
+        public Long getCode() {
+            return 0L;
         }
         
         @Override
@@ -19,7 +19,7 @@ public interface ROption {
         }
     };
     
-    Integer getCode();
+    Long getCode();
     
     String getMessage();
 }

@@ -13,27 +13,38 @@ import org.cqq.openlibrary.common.interfaces.ROption;
 @AllArgsConstructor
 public enum ExceptionROption implements ROption {
     
-    // Success
-    SUCCESS(0, "成功"),
+    // Code : Type_SubType_Event
     
     // Client
-    CLIENT_EXCEPTION(1000, "客户端异常"),
-    CLIENT_UNAUTHENTICATED(1001, "未认证"),
-    CLIENT_UNAUTHORIZED(1002, "未授权"),
-    CLIENT_VALIDATED_PARAM_EXCEPTION(1003, "请求参数异常"),
+    CLIENT_EXCEPTION(ExceptionTypeEnum.CLIENT, 1_0000_0000L, "客户端异常"),
+    CLIENT_UNAUTHENTICATED(ExceptionTypeEnum.CLIENT, 1_0000_0001L,  "未认证"),
+    CLIENT_UNAUTHORIZED(ExceptionTypeEnum.CLIENT, 1_0000_0002L,"未授权"),
+    CLIENT_VALIDATED_PARAM_EXCEPTION(ExceptionTypeEnum.CLIENT, 1_0000_0003L, "请求参数异常"),
     
     // Server
-    SERVER_EXCEPTION(2000, "服务异常"),
-    SERVER_NETWORK_EXCEPTION(2001, "服务异常"),
+    SERVER_EXCEPTION(ExceptionTypeEnum.SERVER, 2_0000_0000L, "服务端异常"),
+    SERVER_NETWORK_EXCEPTION(ExceptionTypeEnum.SERVER, 2_0000_0001L, "网络异常"),
+    IO_EXCEPTION(ExceptionTypeEnum.SERVER, 2_0000_0002L, "IO异常"),
     
     // Business
-    BIZ_EXCEPTION(3000, "业务异常"),
-    BIZ_WECHAT_EXCEPTION(3001, "微信异常"),
-    BIZ_ALIPAY_EXCEPTION(3002, "支付宝异常"),
-    BIZ_ALI_YUN_EXCEPTION(3002, "阿里云异常")
+    BIZ_EXCEPTION(ExceptionTypeEnum.BUSINESS, 3_0000_0000L, "业务异常"),
+    BIZ_WECHAT_EXCEPTION(ExceptionTypeEnum.BUSINESS, 3_0001_0000L, "微信异常"),
+    BIZ_ALIPAY_EXCEPTION(ExceptionTypeEnum.BUSINESS, 3_0002_0000L, "支付宝异常"),
+    BIZ_ALI_YUN_EXCEPTION(ExceptionTypeEnum.BUSINESS, 3_0003_0000L, "阿里云异常")
     ;
     
-    private final Integer code;
+    
+    private final ExceptionTypeEnum exceptionTypeEnum;
+    
+    private final Long code;
     
     private final String message;
+    
+    @Getter
+    @AllArgsConstructor
+    public enum ExceptionTypeEnum {
+        CLIENT,
+        SERVER,
+        BUSINESS
+    }
 }

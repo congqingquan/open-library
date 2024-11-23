@@ -15,6 +15,7 @@ import okhttp3.ResponseBody;
 import org.cqq.openlibrary.common.exception.server.NetworkException;
 import org.cqq.openlibrary.common.exception.biz.WechatException;
 import org.cqq.openlibrary.common.func.checked.CheckedFunction;
+import org.cqq.openlibrary.common.sdk.wechat.response.base.WechatResponse;
 
 import java.util.HashMap;
 import java.util.List;
@@ -71,17 +72,17 @@ public class OkHttpUtils {
         }
     }
     
-    public static <R> R consumeResponseBodyString(Response response, String apiDesc, CheckedFunction<String, R, ?> checkedFunction) {
+    public static <R extends WechatResponse<R>> R consumeResponseBody(Response response, String apiDesc,
+                                                                    CheckedFunction<ResponseBody, R, ?> responseBodyMapper) {
         try (response) {
             ResponseBody body = response.body();
             if (body == null) {
                 throw new WechatException("The response body of " + apiDesc + " API is null");
             }
-            String bodyString = body.string();
             if (!response.isSuccessful()) {
-                throw new WechatException(apiDesc + " API response isn't successful: " + bodyString);
+                throw new WechatException(apiDesc + " API response isn't successful: " + response);
             }
-            return checkedFunction.apply(bodyString);
+            return responseBodyMapper.apply(body);
         } catch (Throwable throwable) {
             throw new WechatException("Call " + apiDesc + " API failed", throwable);
         }
