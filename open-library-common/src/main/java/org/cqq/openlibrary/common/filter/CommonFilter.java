@@ -7,6 +7,7 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.AllArgsConstructor;
 import org.cqq.openlibrary.common.constants.Constants;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -16,6 +17,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 /**
@@ -23,8 +25,11 @@ import java.util.stream.Collectors;
  *
  * @author Qingquan
  */
+@AllArgsConstructor
 public class CommonFilter implements Filter {
 
+    private final BiConsumer<HttpServletRequest, HttpServletResponse> postSetting;
+    
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse,
                          FilterChain filterChain) throws IOException, ServletException {
@@ -33,12 +38,14 @@ public class CommonFilter implements Filter {
         HttpServletResponse response = (HttpServletResponse) servletResponse;
         // 1. cross-origin
         crossOrigin(request, response);
+        // 2. encoding
+        utf8Encoding(request, response);
+        // 3. post setting
+        postSetting.accept(request, response);
         if (HttpMethod.OPTIONS.matches(request.getMethod())) {
             response.setStatus(HttpStatus.OK.value());
             return;
         }
-        // 2. encoding
-        utf8Encoding(request, response);
         // 3. do filter
         filterChain.doFilter(servletRequest, servletResponse);
     }
@@ -55,8 +62,12 @@ public class CommonFilter implements Filter {
                 HttpHeaders.ACCESS_CONTROL_ALLOW_HEADERS,
                 String.join(
                         Constants.COMMA,
-                        HttpHeaders.CONTENT_TYPE, HttpHeaders.ACCEPT, HttpHeaders.ORIGIN, HttpHeaders.AUTHORIZATION,
-                        HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD, HttpHeaders.ACCESS_CONTROL_REQUEST_HEADERS,
+                        HttpHeaders.CONTENT_TYPE,
+                        HttpHeaders.ACCEPT,
+                        HttpHeaders.ORIGIN,
+                        HttpHeaders.AUTHORIZATION,
+                        HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD,
+                        HttpHeaders.ACCESS_CONTROL_REQUEST_HEADERS,
                         "X-Requested-With"
                 )
         );
@@ -64,6 +75,6 @@ public class CommonFilter implements Filter {
     
     private void utf8Encoding(HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException {
         request.setCharacterEncoding(StandardCharsets.UTF_8.name());
-        response.setHeader(HttpHeaders.CONTENT_TYPE, "text/html;charset=UTF-8");
+        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
     }
 }
