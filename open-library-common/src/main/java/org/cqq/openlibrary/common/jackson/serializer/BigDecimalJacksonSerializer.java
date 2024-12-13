@@ -14,9 +14,9 @@ import java.util.Objects;
  *
  * @author Qingquan
  */
-public class Reserve2BigDecimalsJacksonSerializer extends JsonSerializer<BigDecimal> {
+public class BigDecimalJacksonSerializer extends JsonSerializer<BigDecimal> {
 
-    public static final Reserve2BigDecimalsJacksonSerializer instance = new Reserve2BigDecimalsJacksonSerializer();
+    public static final BigDecimalJacksonSerializer instance = new BigDecimalJacksonSerializer();
 
     @Override
     public void serialize(BigDecimal value, JsonGenerator generator, SerializerProvider serializers) throws IOException {

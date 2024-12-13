@@ -15,9 +15,9 @@ import java.math.RoundingMode;
  *
  * @author Qingquan
  */
-public class Reserve2BigDecimalsJacksonDeserializer extends JsonDeserializer<BigDecimal> {
+public class BigDecimalJacksonDeserializer extends JsonDeserializer<BigDecimal> {
 
-    public static final Reserve2BigDecimalsJacksonDeserializer instance = new Reserve2BigDecimalsJacksonDeserializer();
+    public static final BigDecimalJacksonDeserializer instance = new BigDecimalJacksonDeserializer();
 
     @Override
     public BigDecimal deserialize(JsonParser parser, DeserializationContext ctx) throws IOException {

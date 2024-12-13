@@ -9,14 +9,14 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * Serializer: List<Long> > String[]
+ * {@literal Serializer: List<Long> > String[]}
  *
  * @author Qingquan
  */
-public class ListLongSerializer extends JsonSerializer<List<Long>> {
-
-    public static final ListLongSerializer instance = new ListLongSerializer();
-
+public class LongListSerializer extends JsonSerializer<List<Long>> {
+    
+    public static final LongListSerializer instance = new LongListSerializer();
+    
     @Override
     public void serialize(List<Long> values, JsonGenerator generator, SerializerProvider serializers) throws IOException {
         if (CollectionUtils.isEmpty(values)) {

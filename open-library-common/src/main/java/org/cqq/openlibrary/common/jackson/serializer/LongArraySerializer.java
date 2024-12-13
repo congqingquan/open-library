@@ -9,26 +9,26 @@ import java.io.IOException;
 import java.util.Arrays;
 
 /**
- * Serializer: long[] > String[]
+ * Serializer: Long[] > String[]
  *
  * @author Qingquan
  */
-public class ArrayPrimitiveLongSerializer extends JsonSerializer<long[]> {
+public class LongArraySerializer extends JsonSerializer<Long[]> {
 
-    public static final ArrayPrimitiveLongSerializer instance = new ArrayPrimitiveLongSerializer();
+    public static final LongArraySerializer instance = new LongArraySerializer();
 
     @Override
-    public void serialize(long[] values, JsonGenerator generator, SerializerProvider serializers) throws IOException {
+    public void serialize(Long[] values, JsonGenerator generator, SerializerProvider serializers) throws IOException {
         if (ArrayUtils.isEmpty(values)) {
             generator.writeNull();
             return;
         }
-        String[] newValues = Arrays.stream(values).mapToObj(String::valueOf).toArray(String[]::new);
+        String[] newValues = Arrays.stream(values).map(Object::toString).toArray(String[]::new);
         generator.writeArray(newValues, 0, newValues.length);
     }
 
     @Override
-    public Class<long[]> handledType() {
-        return long[].class;
+    public Class<Long[]> handledType() {
+        return Long[].class;
     }
 }
