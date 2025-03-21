@@ -27,13 +27,13 @@ import java.util.stream.Collectors;
  */
 @AllArgsConstructor
 public class CommonFilter implements Filter {
-
+    
     private final BiConsumer<HttpServletRequest, HttpServletResponse> postSetting;
     
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse,
                          FilterChain filterChain) throws IOException, ServletException {
-
+        
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpServletResponse response = (HttpServletResponse) servletResponse;
         // 1. cross-origin

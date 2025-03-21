@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.handler.TenantLineHandler;
 import lombok.AllArgsConstructor;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.LongValue;
+import net.sf.jsqlparser.expression.operators.relational.IsNullExpression;
 import org.cqq.openlibrary.common.util.CollectionUtils;
 
 import java.util.List;
@@ -22,7 +23,7 @@ public class TenantHandler implements TenantLineHandler {
     public Expression getTenantId() {
         Long tenantId = TenantHolder.getTenantId();
         if (tenantId == null) {
-            return null;
+            return new IsNullExpression();
         }
         return new LongValue(tenantId);
     }
