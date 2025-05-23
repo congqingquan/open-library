@@ -3,6 +3,7 @@ package org.cqq.openlibrary.common.interceptor;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.cqq.openlibrary.common.annotation.Auth;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
@@ -16,7 +17,9 @@ import java.lang.reflect.Method;
 public class AuthInterceptor implements HandlerInterceptor {
     
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+    public boolean preHandle(@NotNull HttpServletRequest request,
+                             @NotNull HttpServletResponse response,
+                             @NotNull Object handler) {
         if (!(handler instanceof HandlerMethod handlerMethod)) {
             return true;
         }
@@ -39,12 +42,12 @@ public class AuthInterceptor implements HandlerInterceptor {
     /**
      * 检查登录
      */
-    public void checkAuthenticated(HttpServletRequest request, HttpServletResponse response, Object handler) {
+    protected void checkAuthenticated(HttpServletRequest request, HttpServletResponse response, Object handler) {
     }
     
     /**
      * 检查权限
      */
-    public void checkAuthorized(HttpServletRequest request, HttpServletResponse response, Object handler) {
+    protected void checkAuthorized(HttpServletRequest request, HttpServletResponse response, Object handler) {
     }
 }

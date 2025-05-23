@@ -19,12 +19,12 @@ public enum ExceptionROption implements ROption {
     CLIENT_EXCEPTION(ExceptionTypeEnum.CLIENT, 1_0000_0000L, "客户端异常"),
     CLIENT_UNAUTHENTICATED(ExceptionTypeEnum.CLIENT, 1_0000_0001L,  "未认证"),
     CLIENT_UNAUTHORIZED(ExceptionTypeEnum.CLIENT, 1_0000_0002L,"未授权"),
-    CLIENT_VALIDATED_PARAM_EXCEPTION(ExceptionTypeEnum.CLIENT, 1_0000_0003L, "请求参数异常"),
     
     // Server
     SERVER_EXCEPTION(ExceptionTypeEnum.SERVER, 2_0000_0000L, "服务端异常"),
-    SERVER_NETWORK_EXCEPTION(ExceptionTypeEnum.SERVER, 2_0000_0001L, "网络异常"),
-    IO_EXCEPTION(ExceptionTypeEnum.SERVER, 2_0000_0002L, "IO异常"),
+    SERVER_VALIDATED_PARAM_EXCEPTION(ExceptionTypeEnum.SERVER, 2_0000_0001L, "请求参数异常"),
+    SERVER_NETWORK_EXCEPTION(ExceptionTypeEnum.SERVER, 2_0000_0002L, "网络异常"),
+    IO_EXCEPTION(ExceptionTypeEnum.SERVER, 2_0000_0003L, "IO异常"),
     
     // Business
     BIZ_EXCEPTION(ExceptionTypeEnum.BUSINESS, 3_0000_0000L, "业务异常"),

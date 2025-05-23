@@ -13,6 +13,8 @@
         <module>open-library-common</module>
         <module>open-library-trade</module>
         <module>open-library-notification</module>
+        <module>open-library-storage</module>
+        <module>open-library-spring-boot3-starter</module>
     </modules>
 
     <properties>
@@ -133,7 +135,14 @@
                 <artifactId>javase</artifactId>
                 <version>${zxing-javase.version}</version>
             </dependency>
-    
+
+            <!-- swagger -->
+            <dependency>
+                <groupId>io.swagger.core.v3</groupId>
+                <artifactId>swagger-annotations-jakarta</artifactId>
+                <version>2.2.19</version>
+            </dependency>
+
             <!-- lombok -->
             <dependency>
                 <groupId>org.projectlombok</groupId>
@@ -155,6 +164,18 @@
             <dependency>
                 <groupId>org.cqq</groupId>
                 <artifactId>open-library-notification</artifactId>
+                <version>${open-library.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.cqq</groupId>
+                <artifactId>open-library-storage</artifactId>
+                <version>${open-library.version}</version>
+            </dependency>
+
+            <!-- ============================= module-starters ============================= -->
+            <dependency>
+                <groupId>org.cqq</groupId>
+                <artifactId>open-library-storage-spring-boot3-starter</artifactId>
                 <version>${open-library.version}</version>
             </dependency>
 

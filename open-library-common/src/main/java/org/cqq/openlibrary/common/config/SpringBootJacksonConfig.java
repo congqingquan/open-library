@@ -1,16 +1,17 @@
 package org.cqq.openlibrary.common.config;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import org.cqq.openlibrary.common.jackson.deserializer.BigDecimalJacksonDeserializer;
 import org.cqq.openlibrary.common.jackson.deserializer.LocalDateJacksonDeserializer;
 import org.cqq.openlibrary.common.jackson.deserializer.LocalDateTimeJacksonDeserializer;
 import org.cqq.openlibrary.common.jackson.deserializer.LocalTimeJacksonDeserializer;
-import org.cqq.openlibrary.common.jackson.deserializer.BigDecimalJacksonDeserializer;
-import org.cqq.openlibrary.common.jackson.serializer.LongArraySerializer;
-import org.cqq.openlibrary.common.jackson.serializer.PrimitiveLongArraySerializer;
+import org.cqq.openlibrary.common.jackson.serializer.BigDecimalJacksonSerializer;
 import org.cqq.openlibrary.common.jackson.serializer.LocalDateJacksonSerializer;
 import org.cqq.openlibrary.common.jackson.serializer.LocalDateTimeJacksonSerializer;
 import org.cqq.openlibrary.common.jackson.serializer.LocalTimeJacksonSerializer;
-import org.cqq.openlibrary.common.jackson.serializer.BigDecimalJacksonSerializer;
+import org.cqq.openlibrary.common.jackson.serializer.LongArraySerializer;
+import org.cqq.openlibrary.common.jackson.serializer.PrimitiveLongArraySerializer;
 import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
@@ -45,5 +46,9 @@ public class SpringBootJacksonConfig implements Jackson2ObjectMapperBuilderCusto
         jacksonObjectMapperBuilder.deserializerByType(LocalDate.class, LocalDateJacksonDeserializer.instance);
         jacksonObjectMapperBuilder.deserializerByType(LocalDateTime.class, LocalDateTimeJacksonDeserializer.instance);
         jacksonObjectMapperBuilder.deserializerByType(BigDecimal.class, BigDecimalJacksonDeserializer.instance);
+        
+        // 3. 特性配置
+        // 3.1) 启用 - 不支持数值匹配枚举成员(by ordinal)
+        jacksonObjectMapperBuilder.featuresToEnable(DeserializationFeature.FAIL_ON_NUMBERS_FOR_ENUMS);
     }
 }

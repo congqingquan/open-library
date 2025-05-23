@@ -24,7 +24,15 @@ public class EnumUtils {
             return false;
         }
     }
-
+    
+    @SuppressWarnings("unchecked")
+    public static Class<Enum<?>> toWildcardEnumClass(Class<?> rawEnumClass) {
+        if (!rawEnumClass.isEnum()) {
+            throw new IllegalArgumentException("Class must be an enum");
+        }
+        return (Class<Enum<?>>) rawEnumClass;
+    }
+    
     public static <E extends Enum<E>> List<E> getEnumConstants(Class<E> enumClass) {
         return enumClass == null ? new ArrayList<>() : CollectionUtils.newArrayList(enumClass.getEnumConstants());
     }
@@ -58,13 +66,13 @@ public class EnumUtils {
         return Optional.empty();
     }
     
-    public static <M, E extends Enum<E>> Optional<E> equalMatchByName(Class<E> enumClass, M matchValue) {
-        return equalMatchByName(enumClass.getEnumConstants(), matchValue);
+    public static <E extends Enum<?>> Optional<E> equalMatchByName(Class<E> enumClass, String name) {
+        return equalMatchByName(enumClass.getEnumConstants(), name);
     }
     
-    public static <M, E extends Enum<E>> Optional<E> equalMatchByName(E[] enums, M matchValue) {
+    public static <M, E extends Enum<?>> Optional<E> equalMatchByName(E[] enums, String name) {
         for (E enumConstant : enums) {
-            if (enumConstant.name().equals(matchValue)) {
+            if (enumConstant.name().equals(name)) {
                 return Optional.of(enumConstant);
             }
         }

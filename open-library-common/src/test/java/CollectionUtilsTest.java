@@ -43,4 +43,33 @@ public class CollectionUtilsTest {
             System.out.println();
         });
     }
+    
+    
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Accessors(chain = true)
+    static class CompareData {
+        private String id;
+        private String name;
+    }
+    @Test
+    public void compareTest() {
+        List<CompareData> oldEls = List.of(
+                new CompareData("1", "张三"),
+                new CompareData("2", "李四"),
+                new CompareData("3", "王五")
+        );
+        List<CompareData> newEls = List.of(
+                new CompareData("2", "李四"),
+                new CompareData("4", "赵六")
+        );
+        CollectionUtils.CompareResult<ArrayList<CompareData>, CompareData> compare = CollectionUtils.compare(
+                oldEls,
+                newEls,
+                CompareData::getId,
+                ArrayList::new
+        );
+        System.out.println(compare);
+    }
 }

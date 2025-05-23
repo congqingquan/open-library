@@ -9,7 +9,6 @@ public class TenantHolder {
     
     private static final ThreadLocal<Long> TENANT_ID = ThreadLocal.withInitial(() -> null);
     
-    
     public static void setTenantId(Long tenantId) {
         TENANT_ID.set(tenantId);
     }
