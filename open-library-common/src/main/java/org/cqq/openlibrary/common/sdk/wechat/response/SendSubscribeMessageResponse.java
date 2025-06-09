@@ -18,6 +18,6 @@ public class SendSubscribeMessageResponse extends WechatResponse<SendSubscribeMe
     
     @Override
     public CheckedFunction<ResponseBody, SendSubscribeMessageResponse, ?> parseResponseMapper() {
-        return responseBody -> JSONUtils.parseObject(responseBody.string(), SendSubscribeMessageResponse.class);
+        return responseBody -> JSONUtils.parse(responseBody.string(), SendSubscribeMessageResponse.class);
     }
 }

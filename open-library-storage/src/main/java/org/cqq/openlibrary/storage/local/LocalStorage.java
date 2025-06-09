@@ -16,6 +16,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.text.MessageFormat;
 import java.util.UUID;
 
 /**
@@ -40,6 +41,11 @@ public class LocalStorage implements Storage {
     @Override
     public StorageTypeEnum supportType() {
         return StorageTypeEnum.LOCAL;
+    }
+    
+    @Override
+    public String getDomain() {
+        return MessageFormat.format("{0}://{1}:{2,number,#}/{3}", protocol, host, port, writeDir);
     }
     
     @Override

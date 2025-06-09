@@ -58,7 +58,7 @@ public class JWSUserUtils {
     public static <T> Optional<T> getUserInfo(Class<T> userInfoClass) {
         return getPayloadValue(jwsAuthConfig.getUserInfoPayloadKey(), Object.class)
                 .map(userInfo ->
-                        JSONUtils.parseObject(
+                        JSONUtils.parse(
                             JSONUtils.toJSONString(userInfo),
                             userInfoClass
                         )

@@ -77,4 +77,29 @@ public class StringUtils {
         return result;
     }
 
+    public static String firstLetterToLowerCase(String str) {
+        if (isBlank(str)) {
+            return str;
+        }
+        char firstChar = str.charAt(0);
+        if (Character.isLowerCase(firstChar)) {
+            return str;
+        }
+        char[] arr = str.toCharArray();
+        arr[0] = Character.toLowerCase(firstChar);
+        return new String(arr);
+    }
+    
+    public static String firstLetterToUpperCase(String str) {
+        if (isBlank(str)) {
+            return str;
+        }
+        char firstChar = str.charAt(0);
+        if (Character.isUpperCase(firstChar)) {
+            return str;
+        }
+        char[] arr = str.toCharArray();
+        arr[0] = Character.toUpperCase(firstChar);
+        return new String(arr);
+    }
 }

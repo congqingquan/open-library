@@ -1,4 +1,4 @@
-package org.cqq.openlibrary.common.interceptor;
+package org.cqq.openlibrary.common.web.interceptor;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

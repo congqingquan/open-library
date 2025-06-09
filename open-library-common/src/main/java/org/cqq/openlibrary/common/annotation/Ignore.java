@@ -26,4 +26,6 @@ import java.lang.annotation.Target;
         ElementType.METHOD,
 })
 public @interface Ignore {
+    
+    String[] additional() default {};
 }

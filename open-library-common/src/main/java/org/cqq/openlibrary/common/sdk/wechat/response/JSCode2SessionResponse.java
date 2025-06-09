@@ -27,6 +27,6 @@ public class JSCode2SessionResponse extends WechatResponse<JSCode2SessionRespons
     
     @Override
     public CheckedFunction<ResponseBody, JSCode2SessionResponse, ?> parseResponseMapper() {
-        return responseBody -> JSONUtils.parseObject(responseBody.string(), JSCode2SessionResponse.class);
+        return responseBody -> JSONUtils.parse(responseBody.string(), JSCode2SessionResponse.class);
     }
 }

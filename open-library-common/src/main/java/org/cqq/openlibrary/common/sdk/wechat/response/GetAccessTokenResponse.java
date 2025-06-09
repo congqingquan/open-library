@@ -25,6 +25,6 @@ public class GetAccessTokenResponse extends WechatResponse<GetAccessTokenRespons
     
     @Override
     public CheckedFunction<ResponseBody, GetAccessTokenResponse, ?> parseResponseMapper() {
-        return responseBody -> JSONUtils.parseObject(responseBody.string(), GetAccessTokenResponse.class);
+        return responseBody -> JSONUtils.parse(responseBody.string(), GetAccessTokenResponse.class);
     }
 }

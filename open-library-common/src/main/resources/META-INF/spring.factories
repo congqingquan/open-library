@@ -1,7 +1,7 @@
-# Auto Configure
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
- org.cqq.openlibrary.common.util.spring.SpringUtils,\
- org.cqq.openlibrary.common.util.spring.SpringTransactionHelper,\
- org.cqq.openlibrary.common.component.template.RedisLockTemplate,\
- org.cqq.openlibrary.common.component.template.SpringTransactionTemplate,\
- org.cqq.openlibrary.common.component.template.RedisLockSpringTransactionTemplate
+## Auto Configure
+#org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+# org.cqq.openlibrary.common.util.spring.SpringUtils,\
+# org.cqq.openlibrary.common.util.spring.SpringTransactionHelper,\
+# org.cqq.openlibrary.common.component.template.RedisLockTemplate,\
+# org.cqq.openlibrary.common.component.template.SpringTransactionTemplate,\
+# org.cqq.openlibrary.common.component.template.RedisLockSpringTransactionTemplate

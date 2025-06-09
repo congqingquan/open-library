@@ -3,6 +3,7 @@ package org.cqq.openlibrary.common.exception;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintDeclarationException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
@@ -13,31 +14,27 @@ import org.cqq.openlibrary.common.exception.client.UnauthenticatedException;
 import org.cqq.openlibrary.common.exception.client.UnauthorizedException;
 import org.cqq.openlibrary.common.exception.server.ServerException;
 import org.cqq.openlibrary.common.interfaces.ROption;
-import org.springframework.context.support.DefaultMessageSourceResolvable;
+import org.cqq.openlibrary.common.util.CollectionUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
- * Common exception handler
+ * Exception handler
  *
  * @author Qingquan
  */
 @Slf4j
-@ResponseBody
-public class CommonExceptionHandler {
+public class ExceptionHandler {
     
     
     // =============================================== Common ===============================================
@@ -57,44 +54,28 @@ public class CommonExceptionHandler {
     
     // =============================================== 1.x Client ===============================================
     
-    private String getFirstFieldErrorMessage(List<FieldError> fieldsErrorList) {
-        return fieldsErrorList
-                .stream()
-                .findFirst()
-                .map(DefaultMessageSourceResolvable::getDefaultMessage)
-                .orElse(null);
-    }
-    
-    private String getAllFieldErrorMessage(List<FieldError> fieldErrorList) {
-        return fieldErrorList
-                .stream()
-                .map(error -> String.format("[%s > %s]", error.getField(), error.getDefaultMessage()))
-                .collect(Collectors.joining());
-    }
-    
-    @ExceptionHandler(UnauthenticatedException.class)
+    @org.springframework.web.bind.annotation.ExceptionHandler(UnauthenticatedException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public R<?> handleUnauthenticatedException(HttpServletRequest request, UnauthenticatedException exception) {
         return commonHandle(ExceptionROption.CLIENT_UNAUTHENTICATED, request, exception);
     }
     
-    @ExceptionHandler(UnauthorizedException.class)
+    @org.springframework.web.bind.annotation.ExceptionHandler(UnauthorizedException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public R<?> handleUnauthorizedException(HttpServletRequest request, UnauthorizedException exception) {
         return commonHandle(ExceptionROption.CLIENT_UNAUTHORIZED, request, exception);
     }
     
-    @ExceptionHandler(ClientException.class)
+    @org.springframework.web.bind.annotation.ExceptionHandler(ClientException.class)
     @ResponseStatus(HttpStatus.OK)
     public R<?> handleClientException(HttpServletRequest request, ClientException exception) {
         return commonHandle(exception.getClientExceptionROption(), request, exception);
     }
     
-    
     // =============================================== 2.x Server ===============================================
     
     // Jackson mapping exception (Execute before spring validator)
-    @ExceptionHandler(value = {HttpMessageNotReadableException.class,})
+    @org.springframework.web.bind.annotation.ExceptionHandler(value = {HttpMessageNotReadableException.class,})
     @ResponseStatus(HttpStatus.OK)
     public R<?> handleJsonMappingException(HttpServletRequest request, HttpMessageNotReadableException exception) {
         ExceptionROption exceptionROption = ExceptionROption.SERVER_VALIDATED_PARAM_EXCEPTION;
@@ -124,7 +105,9 @@ public class CommonExceptionHandler {
     }
     
     // Spring validator exception
-    @ExceptionHandler(value = {BindException.class, MethodArgumentNotValidException.class, ConstraintViolationException.class,})
+    @org.springframework.web.bind.annotation.ExceptionHandler(value = {
+            BindException.class, MethodArgumentNotValidException.class, ConstraintViolationException.class, ConstraintDeclarationException.class
+    })
     @ResponseStatus(HttpStatus.OK)
     public R<?> handleValidatorException(HttpServletRequest request, Throwable exception) {
         
@@ -135,18 +118,22 @@ public class CommonExceptionHandler {
         // ConstraintViolationException: ValidationException 的子类异常
         if (exception instanceof ConstraintViolationException constraintViolationException) {
             Set<ConstraintViolation<?>> constraintViolations = constraintViolationException.getConstraintViolations();
-            message = constraintViolations.stream().findFirst().map(ConstraintViolation::getMessage).orElse(null);
+            message = CollectionUtils.getLast(constraintViolations).map(ConstraintViolation::getMessage).orElse(null);
         }
-        // BindException: 顶级的参数校验异常
+        // ConstraintDeclarationException: ValidationException 的子类异常
+        else if (exception instanceof ConstraintDeclarationException constraintDeclarationException) {
+            message = constraintDeclarationException.getMessage();
+        }
         // MethodArgumentNotValidException: BindException 的子类，当接口的请求类型为 application/json 时产生的参数校验异常
+        // BindException: 顶级的参数校验异常
         else if (exception instanceof BindException bindException) {
-            message = getFirstFieldErrorMessage(bindException.getBindingResult().getFieldErrors());
+            message = CollectionUtils.getLast(bindException.getBindingResult().getFieldErrors()).map(FieldError::getDefaultMessage).orElse(null);
         }
         
         return R.response(exceptionROption.getCode(), null, message);
     }
     
-    @ExceptionHandler(ServerException.class)
+    @org.springframework.web.bind.annotation.ExceptionHandler(ServerException.class)
     @ResponseStatus(HttpStatus.OK)
     public R<?> handleBusinessException(HttpServletRequest request, ServerException exception) {
         return commonHandle(exception.getServerExceptionROption(), request, exception);
@@ -154,7 +141,7 @@ public class CommonExceptionHandler {
     
     // =============================================== 3.x Business ===============================================
     
-    @ExceptionHandler(BusinessException.class)
+    @org.springframework.web.bind.annotation.ExceptionHandler(BusinessException.class)
     @ResponseStatus(HttpStatus.OK)
     public R<?> handleBusinessException(HttpServletRequest request, BusinessException exception) {
         return commonHandle(exception.getBizExceptionROption(), request, exception);
@@ -162,7 +149,7 @@ public class CommonExceptionHandler {
     
     // =============================================== 兜底处理 ===============================================
     
-    @ExceptionHandler(Exception.class)
+    @org.springframework.web.bind.annotation.ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.OK)
     public R<?> handleException(HttpServletRequest request, Exception exception) {
         return commonHandle(ExceptionROption.SERVER_EXCEPTION, request, exception);

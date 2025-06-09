@@ -14,6 +14,7 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.TreeSet;
 import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
@@ -231,6 +232,12 @@ public class CollectionUtils {
         deletedEls.addAll(collMap.values());
         
         return new CompareResult<>(newEls, existsInBothEls, deletedEls);
+    }
+    
+    // ====================================== Collection method ======================================
+    
+    public static <T> Optional<T> getLast(Collection<T> collection) {
+        return collection.isEmpty() ? Optional.empty() : collection.stream().skip(collection.size() - 1).findFirst();
     }
     
     // ====================================== List method ======================================

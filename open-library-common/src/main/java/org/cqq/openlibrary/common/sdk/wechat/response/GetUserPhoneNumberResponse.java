@@ -40,6 +40,6 @@ public class GetUserPhoneNumberResponse extends WechatResponse<GetUserPhoneNumbe
     
     @Override
     public CheckedFunction<ResponseBody, GetUserPhoneNumberResponse, ?> parseResponseMapper() {
-        return responseBody -> JSONUtils.parseObject(responseBody.string(), GetUserPhoneNumberResponse.class);
+        return responseBody -> JSONUtils.parse(responseBody.string(), GetUserPhoneNumberResponse.class);
     }
 }

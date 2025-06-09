@@ -3,11 +3,15 @@ package org.cqq.openlibrary.common.util;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
+import org.cqq.openlibrary.common.exception.server.IORuntimeException;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Enumeration;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,10 +22,13 @@ import java.util.function.Function;
  *
  * @author Qingquan
  */
+@Slf4j
 public class HttpContext {
     
     private HttpContext() {
     }
+    
+    // ===================================== ServletRequestAttributes =====================================
     
     public static HttpServletRequest getRequest() {
         return getServletRequestAttributes().getRequest();
@@ -35,60 +42,52 @@ public class HttpContext {
         return (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
     }
     
+    // ===================================== Header =====================================
+    
     public static List<String> getHeadNames() {
-        Enumeration<String> headerNames = getRequest().getHeaderNames();
-        List<String> resultList = new ArrayList<>();
-        while (headerNames.hasMoreElements()) {
-            resultList.add(headerNames.nextElement());
-        }
-        return resultList;
+        return EnumerationUtils.toCollection(getRequest().getHeaderNames(), ArrayList::new);
     }
     
-    public static Map<String, String> getAllHeader() {
-        Map<String, String> resultMap = new HashMap<>();
+    public static <T> Map<String, ? super T> getHeaderMap(Function<String, ? extends T> valueMapping) {
         HttpServletRequest request = getRequest();
-        Enumeration<String> headerNames = request.getHeaderNames();
-        while (headerNames.hasMoreElements()) {
-            String headerName = headerNames.nextElement();
-            resultMap.put(headerName, request.getHeader(headerName));
-        }
+        Map<String, T> resultMap = new HashMap<>();
+        EnumerationUtils.foreach(
+                request.getHeaderNames(),
+                headerName ->
+                        resultMap.put(
+                                headerName,
+                                valueMapping.apply(request.getHeader(headerName))
+                        )
+        );
         return resultMap;
     }
     
-    public static <T> List<T> getHeaders(String name, Function<String, T> mapping) {
-        Enumeration<String> headers = getRequest().getHeaders(name);
-        List<T> values = new ArrayList<>();
-        while (headers.hasMoreElements()) {
-            values.add(mapping.apply(headers.nextElement()));
-        }
-        return values;
-    }
-
-    public static Map<String, List<String>> getAllHeaders() {
-        Map<String, List<String>> resultMap = new HashMap<>();
-        HttpServletRequest request = HttpContext.getRequest();
-        Enumeration<String> headerNames = request.getHeaderNames();
-        while (headerNames.hasMoreElements()) {
-            String headerName = headerNames.nextElement();
-            List<String> values = getHeaders(headerName, Function.identity());
-            resultMap.put(headerName, values);
-        }
-        return resultMap;
-    }
+    // ===================================== Other =====================================
     
-    public static Cookie getCookie(String matchName) {
-        Cookie[] cookies = getRequest().getCookies();
-        for (Cookie cookie : cookies) {
-            if (matchName.equals(cookie.getName())) {
-                return cookie;
-            }
-        }
-        return null;
+    public static Cookie getCookie(String name) {
+        return Arrays
+                .stream(getRequest().getCookies())
+                .filter(cookie -> cookie.getName().equals(name))
+                .findFirst()
+                .orElse(null);
     }
     
     public static String getRequestDomain() {
         HttpServletRequest request = getRequest();
         StringBuffer requestURL = request.getRequestURL();
         return requestURL.delete(requestURL.length() - request.getRequestURI().length(), requestURL.length()).toString();
+    }
+    
+    public static String getRequestBody(HttpServletRequest request) {
+        StringBuilder bodyBuilder = new StringBuilder();
+        try (BufferedReader bufferedReader = request.getReader()) {
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                bodyBuilder.append(line);
+            }
+        } catch (IOException e) {
+            throw new IORuntimeException(e);
+        }
+        return bodyBuilder.toString();
     }
 }

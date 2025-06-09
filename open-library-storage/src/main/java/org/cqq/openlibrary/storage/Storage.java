@@ -21,6 +21,8 @@ public interface Storage {
     
     StorageTypeEnum supportType();
     
+    String getDomain();
+    
     URL getURL(String objectName);
     
     SaveResult save(String filename, InputStream fileStream);

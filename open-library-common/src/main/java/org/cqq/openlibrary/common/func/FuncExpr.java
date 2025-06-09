@@ -1,6 +1,7 @@
 package org.cqq.openlibrary.common.func;
 
 import org.cqq.openlibrary.common.util.BigDecimalUtils;
+import org.cqq.openlibrary.common.util.ObjectUtils;
 import org.cqq.openlibrary.common.util.StringUtils;
 
 import java.math.BigDecimal;
@@ -14,9 +15,10 @@ import java.util.function.Predicate;
  * @author Qingquan
  */
 public class FuncExpr {
-
-    private FuncExpr() {}
-
+    
+    private FuncExpr() {
+    }
+    
     public static <T extends Comparable<T>> Predicate<T> between(T start, T end) {
         return elment -> elment.compareTo(start) >= 0 && elment.compareTo(end) <= 0;
     }
@@ -27,7 +29,7 @@ public class FuncExpr {
         return t -> Objects.isNull(extractor.apply(t));
     }
     
-    public static <T> Predicate<T> nonNull(Function<? super T, ?> extractor) {
+    public static <T> Predicate<T> notNull(Function<? super T, ?> extractor) {
         return t -> Objects.nonNull(extractor.apply(t));
     }
     
@@ -63,5 +65,9 @@ public class FuncExpr {
                 throw new IllegalArgumentException("Unsupported number type");
             }
         };
+    }
+    
+    public static <T, R> Predicate<T> isEmpty(Function<? super T, ? extends R> extractor) {
+        return t -> ObjectUtils.areEmpty(extractor.apply(t));
     }
 }

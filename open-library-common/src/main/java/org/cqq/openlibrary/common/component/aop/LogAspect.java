@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.Signature;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.cqq.openlibrary.common.annotation.Ignore;
 import org.cqq.openlibrary.common.jwt.JWSUserUtils;
 import org.cqq.openlibrary.common.util.ArrayUtils;
 import org.cqq.openlibrary.common.util.HttpContext;
@@ -18,17 +19,41 @@ import java.util.Optional;
 import java.util.UUID;
 
 /**
- * Common 日志切面
+ * Log aspect
  *
  * @author Qingquan
  */
 @Slf4j
-public class CommonLogAspect {
+public class LogAspect {
+    
+    public static final String ADDITIONAL_IGNORE_REQUEST_PARAM = "ADDITIONAL_IGNORE_REQUEST_PARAM";
+    
+    public static final String ADDITIONAL_IGNORE_RESPONSE_PARAM = "ADDITIONAL_IGNORE_RESPONSE_PARAM";
     
     public Object webLogAround(ProceedingJoinPoint point) throws Throwable {
         Signature signature = point.getSignature();
         if (!(signature instanceof MethodSignature methodSignature)) {
             return point.proceed();
+        }
+        // 处理忽略逻辑
+        Ignore ignore = methodSignature.getMethod().getAnnotation(Ignore.class);
+        boolean ignoreRequestParam = false;
+        boolean ignoreResponseParam = false;
+        if (ignore != null) {
+            for (String additional : ignore.additional()) {
+                if (ADDITIONAL_IGNORE_REQUEST_PARAM.equals(additional)) {
+                    ignoreRequestParam = true;
+                }
+                else if (ADDITIONAL_IGNORE_RESPONSE_PARAM.equals(additional)) {
+                    ignoreResponseParam = true;
+                }
+            }
+            // 忽略:
+            // 1. 添加了 ignore 注解但没有指定忽略策略(默认为忽略所有)
+            // 2. 添加了 ignore 注解但指定了全部的忽略策略(手动设置为忽略所有)
+            if (ArrayUtils.isEmpty(ignore.additional()) || (ignoreRequestParam && ignoreResponseParam)) {
+                return point.proceed();
+            }
         }
         // 1. 记录入参
         // 1) 设置traceId
@@ -41,11 +66,13 @@ public class CommonLogAspect {
         String requestIp = NetUtils.getIpAddress(HttpContext.getRequest());
         String className = point.getTarget().getClass().getName();
         String methodName = methodSignature.getName();
-        log.info("用户 [{}] IP [{}] 进入 [{}.{}] 方法 {} 入参 [{}] {}",
-                userId == null ? "No user id" : userId, requestIp, className, methodName,
-                getLineSeparator(2),
-                MapUtils.isEmpty(requestParamMap) ? "" : requestParamMap,
-                getLineSeparator(0));
+        if (!ignoreRequestParam) {
+            log.info("用户 [{}] IP [{}] 进入 [{}.{}] 方法 {} 入参 [{}] {}",
+                    userId == null ? "No user id" : userId, requestIp, className, methodName,
+                    getLineSeparator(2),
+                    MapUtils.isEmpty(requestParamMap) ? "" : requestParamMap,
+                    getLineSeparator(0));
+        }
         
         // 2. 业务方法执行
         // 1) 计时(毫秒)
@@ -56,12 +83,14 @@ public class CommonLogAspect {
             result = point.proceed();
             // 3. 记录出参
             long totalTimeMillis = System.currentTimeMillis() - start;
-            log.info("用户 [{}] IP [{}] 结束 [{}.{}] 方法调用 耗时 {}ms {} 出参 [{}] {}",
-                    userId == null ? "No user id" : userId,
-                    requestIp, className, methodName, totalTimeMillis,
-                    getLineSeparator(1),
-                    Optional.ofNullable(result).map(Object::toString).orElse(""),
-                    getLineSeparator(1));
+            if (!ignoreResponseParam) {
+                log.info("用户 [{}] IP [{}] 结束 [{}.{}] 方法调用 耗时 {}ms {} 出参 [{}] {}",
+                        userId == null ? "No user id" : userId,
+                        requestIp, className, methodName, totalTimeMillis,
+                        getLineSeparator(1),
+                        Optional.ofNullable(result).map(Object::toString).orElse(""),
+                        getLineSeparator(1));
+            }
         } finally {
             // 4. 清除traceId
             clearTrackId();

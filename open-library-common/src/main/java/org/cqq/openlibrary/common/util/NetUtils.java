@@ -67,11 +67,15 @@ public class NetUtils {
     /**
      * 转为 GET 请求参数 URI
      */
-    public static String toGetRequestParamsUri(Map<String, String> params) {
+    public static String toGetRequestParamsUri(Map<String, ?> params) {
         if (MapUtils.isEmpty(params)) {
             return "";
         }
-        String paramsStr = params.entrySet().stream().map(entry -> entry.getKey() + "=" + entry.getValue()).collect(Collectors.joining("&"));
+        String paramsStr = params
+                .entrySet()
+                .stream()
+                .map(entry -> entry.getKey() + "=" + entry.getValue())
+                .collect(Collectors.joining("&"));
         return "?" + paramsStr;
     }
     

@@ -1,4 +1,4 @@
-package org.cqq.openlibrary.common.filter;
+package org.cqq.openlibrary.common.web.filter;
 
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
@@ -21,12 +21,12 @@ import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 /**
- * Common filter
+ * Default filter
  *
  * @author Qingquan
  */
 @AllArgsConstructor
-public class CommonFilter implements Filter {
+public class DefaultFilter implements Filter {
     
     private final BiConsumer<HttpServletRequest, HttpServletResponse> postSetting;
     
@@ -34,20 +34,23 @@ public class CommonFilter implements Filter {
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse,
                          FilterChain filterChain) throws IOException, ServletException {
         
-        HttpServletRequest request = (HttpServletRequest) servletRequest;
-        HttpServletResponse response = (HttpServletResponse) servletResponse;
+        if (!(servletRequest instanceof HttpServletRequest httpServletRequest) || !(servletResponse instanceof HttpServletResponse httpServletResponse)) {
+            filterChain.doFilter(servletRequest, servletResponse);
+            return;
+        }
+        
         // 1. cross-origin
-        crossOrigin(request, response);
+        crossOrigin(httpServletRequest, httpServletResponse);
         // 2. encoding
-        utf8Encoding(request, response);
+        utf8Encoding(httpServletRequest, httpServletResponse);
         // 3. post setting
-        postSetting.accept(request, response);
-        if (HttpMethod.OPTIONS.matches(request.getMethod())) {
-            response.setStatus(HttpStatus.OK.value());
+        postSetting.accept(httpServletRequest, httpServletResponse);
+        if (HttpMethod.OPTIONS.matches(httpServletRequest.getMethod())) {
+            httpServletResponse.setStatus(HttpStatus.OK.value());
             return;
         }
         // 3. do filter
-        filterChain.doFilter(servletRequest, servletResponse);
+        filterChain.doFilter(httpServletRequest, httpServletResponse);
     }
     
     private void crossOrigin(HttpServletRequest request, HttpServletResponse response) {
