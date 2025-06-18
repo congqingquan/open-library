@@ -14,7 +14,14 @@ public class StorageConfig {
     
     private String active;
     
-    private String replaceUrlHandler;
-    
     private LocalStorageConfig local;
+    
+    private ReplaceURLHandler replaceUrlHandler;
+    
+    @Data
+    public static class ReplaceURLHandler {
+        private Boolean enable;
+        private String pointcutExpression;
+    }
 }
+

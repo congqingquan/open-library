@@ -24,17 +24,21 @@ import java.util.function.Function;
 @Constraint(validatedBy = DependsOnValidator.class)
 public @interface DependsOn {
     
-    String triggerValue();
-    
-    String dependentField();
-    
-    CheckingMethod checkingMethod();
+    // ============================================== JSR-303/JSR-380 constraint fields ==============================================
     
     String message();
     
     Class<?>[] groups() default {};
     
     Class<? extends Payload>[] payload() default {};
+    
+    // ================================================================================================================================
+    
+    String triggerValue();
+    
+    String dependentField();
+    
+    CheckingMethod checkingMethod();
     
     @Getter
     @AllArgsConstructor

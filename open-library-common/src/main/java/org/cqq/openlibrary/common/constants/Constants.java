@@ -43,11 +43,11 @@ public class Constants {
     
     // ======================================== Biz symbol ========================================
     
-    public static final int TRUE_INT = 1;
+    public static final Integer TRUE_INT = 1;
     
-    public static final int FALSE_INT = 0;
+    public static final Integer FALSE_INT = 0;
     
-    public static final int NOT_DELETED = FALSE_INT;
+    public static final Integer NOT_DELETED = FALSE_INT;
     
-    public static final int DELETED = TRUE_INT;
+    public static final Integer DELETED = TRUE_INT;
 }

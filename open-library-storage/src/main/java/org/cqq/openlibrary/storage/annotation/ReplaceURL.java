@@ -12,8 +12,18 @@ import java.lang.annotation.Target;
  */
 @Documented
 @Target({
-        ElementType.FIELD
+        ElementType.FIELD,
+        ElementType.PARAMETER,
+        ElementType.METHOD
 })
 @Retention(java.lang.annotation.RetentionPolicy.RUNTIME)
 public @interface ReplaceURL {
+    
+    Structure structure() default Structure.SIMPLE_URL;
+    
+    enum Structure {
+        SIMPLE_URL,
+        URL_IN_IMG_TAG,
+        ;
+    }
 }

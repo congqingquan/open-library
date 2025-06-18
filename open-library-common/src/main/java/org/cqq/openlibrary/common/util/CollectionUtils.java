@@ -197,41 +197,64 @@ public class CollectionUtils {
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class CompareResult<C extends Collection<T>, T> {
+    public static class CompareResult<T, CT> {
         
-        private C newEls;
+        private Collection<CT> newEls;
         
-        private C existsInBothEls;
+        // one new element <-> some old elements
+        private Map<CT, Collection<T>> existsInBothEls;
         
-        private C deletedEls;
+        private Collection<T> deletedEls;
     }
     
-    public static <T, K, C extends Collection<T>> CompareResult<C, T> compare(Collection<? extends T> coll,
-                                                                              Collection<? extends T> comparedColl,
-                                                                              Function<? super T, ? extends K> compareKey,
-                                                                              Supplier<C> container) {
+    public static <T, CT> CompareResult<T, CT> compare(Collection<T> coll,
+                                                       Collection<CT> comparedColl,
+                                                       BiPredicate<? super T, ? super CT> comparePredicate) {
         
-        coll = coll == null ? container.get() : coll;
-        comparedColl = comparedColl == null ? container.get() : comparedColl;
+        coll = coll == null ? newHashSet() : addAll(newArrayList(), coll);
+        comparedColl = comparedColl == null ? newArrayList() : comparedColl;
         
         // compare
-        C newEls = container.get();
-        C existsInBothEls = container.get();
-        Map<? extends K, ? extends T> collMap = coll.stream().collect(Collectors.toMap(compareKey, Function.identity()));
-        K key;
-        for (T newElement : comparedColl) {
-            key = compareKey.apply(newElement);
-            if (collMap.get(key) != null) {
-                existsInBothEls.add(newElement);
+        Collection<CT> newEls = newArrayList();
+        Map<CT, Collection<T>> existsInBothElementsMap = new HashMap<>();
+        for (CT newElement : comparedColl) {
+            Collection<T> existsInBothElementList = coll.stream().filter(oldElement -> comparePredicate.test(oldElement, newElement)).toList();
+            if (isNotEmpty(existsInBothElementList)) {
+                existsInBothElementsMap.put(newElement, existsInBothElementList);
             } else {
                 newEls.add(newElement);
             }
-            collMap.remove(key);
+            for (T existsInBothElement : existsInBothElementList) {
+                coll.remove(existsInBothElement);
+            }
         }
-        C deletedEls = container.get();
-        deletedEls.addAll(collMap.values());
+        Collection<T> deletedEls = newArrayList();
+        deletedEls.addAll(coll);
         
-        return new CompareResult<>(newEls, existsInBothEls, deletedEls);
+        return new CompareResult<>(newEls, existsInBothElementsMap, deletedEls);
+    }
+    
+    public static <T> Collection<Collection<T>> cartesianProduct(Collection<Collection<? extends T>> collections) {
+        Collection<Collection<T>> initialState = newArrayList(newArrayList());
+        if (isEmpty(collections)) {
+            return initialState;
+        }
+        return collections.stream().reduce(initialState, (prev, curr) -> {
+            if (isEmpty(curr)) {
+                return prev;
+            }
+            Collection<Collection<T>> res = new ArrayList<>();
+            for (Collection<T> pt : prev) {
+                for (T ct : curr) {
+                    res.add(addAll(new ArrayList<>(pt), ct));
+                }
+            }
+            return res;
+        }, (left, right) -> {
+            Collection<Collection<T>> res = new ArrayList<>(left);
+            res.addAll(right);
+            return res;
+        });
     }
     
     // ====================================== Collection method ======================================

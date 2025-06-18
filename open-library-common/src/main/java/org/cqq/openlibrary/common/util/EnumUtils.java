@@ -70,7 +70,7 @@ public class EnumUtils {
         return equalMatchByName(enumClass.getEnumConstants(), name);
     }
     
-    public static <M, E extends Enum<?>> Optional<E> equalMatchByName(E[] enums, String name) {
+    public static <E extends Enum<?>> Optional<E> equalMatchByName(E[] enums, String name) {
         for (E enumConstant : enums) {
             if (enumConstant.name().equals(name)) {
                 return Optional.of(enumConstant);

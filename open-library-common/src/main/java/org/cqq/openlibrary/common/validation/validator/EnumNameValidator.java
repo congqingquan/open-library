@@ -72,7 +72,15 @@ public class EnumNameValidator implements ConstraintValidator<ValidEnumName, Obj
         
         // String
         if (value instanceof String stringValue) {
-            stringValues.add(stringValue);
+            String splitRegex = constraintAnnotation.splitRegex();
+            // Single string value
+            if (splitRegex.isEmpty()) {
+                stringValues.add(stringValue);
+            }
+            // Can be split string value
+            else {
+                stringValues.addAll(Arrays.stream(stringValue.split(splitRegex)).toList());
+            }
         }
         // Collection<String>
         else if (value instanceof Collection<?> values) {
