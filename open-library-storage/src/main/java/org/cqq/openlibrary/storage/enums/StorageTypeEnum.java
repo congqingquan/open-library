@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * 存储类型枚举
+ * Storage type enum
  *
  * @author Qingquan
  */

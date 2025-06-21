@@ -1,0 +1,23 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.cqq</groupId>
+        <artifactId>open-library</artifactId>
+        <version>${revision}</version>
+    </parent>
+
+    <artifactId>open-library-spring-boot-starter</artifactId>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>open-library-storage-spring-boot-starter</module>
+        <module>open-library-web-spring-boot-starter</module>
+        <module>open-library-common-spring-boot-starter</module>
+        <module>open-library-spring-spring-boot-starter</module>
+        <module>open-library-redis-spring-boot-starter</module>
+        <module>open-library-mybatis-spring-boot-starter</module>
+        <module>open-library-trade-spring-boot-starter</module>
+        <module>open-library-notification-spring-boot-starter</module>
+    </modules>
+</project>

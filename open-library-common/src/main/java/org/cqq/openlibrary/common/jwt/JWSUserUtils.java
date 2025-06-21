@@ -20,11 +20,23 @@ import java.util.Optional;
 @Slf4j
 public class JWSUserUtils {
     
-    private static JWSAuthConfig jwsAuthConfig;
+    private static String authHeader;
+    
+    private static String userIdPayloadKey;
+    
+    private static String userInfoPayloadKey;
+    
+    private static String secretKey;
     
     @InitializeStatic
-    public static void init(JWSAuthConfig config) {
-        JWSUserUtils.jwsAuthConfig = config;
+    public static void init(String authHeader,
+                            String userIdPayloadKey,
+                            String userInfoPayloadKey,
+                            String secretKey) {
+        JWSUserUtils.authHeader = authHeader;
+        JWSUserUtils.userIdPayloadKey = userIdPayloadKey;
+        JWSUserUtils.userInfoPayloadKey = userInfoPayloadKey;
+        JWSUserUtils.secretKey = secretKey;
     }
     
     // ============================== Get user id function ==============================
@@ -38,15 +50,15 @@ public class JWSUserUtils {
     }
     
     public static Optional<Long> getUserIdLong() {
-        return getPayloadValue(jwsAuthConfig.getUserIdPayloadKey(), Long.class);
+        return getPayloadValue(userIdPayloadKey, Long.class);
     }
     
     public static Optional<String> getUserIdStr() {
-        return getPayloadValue(jwsAuthConfig.getUserIdPayloadKey(), String.class);
+        return getPayloadValue(userIdPayloadKey, String.class);
     }
     
     public static <T> @Nullable T getNullableUserId(Class<T> idClass) {
-        return getPayloadValue(jwsAuthConfig.getUserIdPayloadKey(), idClass).orElse(null);
+        return getPayloadValue(userIdPayloadKey, idClass).orElse(null);
     }
     
     // ============================== Get user info function ==============================
@@ -56,11 +68,11 @@ public class JWSUserUtils {
     }
     
     public static <T> Optional<T> getUserInfo(Class<T> userInfoClass) {
-        return getPayloadValue(jwsAuthConfig.getUserInfoPayloadKey(), Object.class)
+        return getPayloadValue(userInfoPayloadKey, Object.class)
                 .map(userInfo ->
                         JSONUtils.parse(
-                            JSONUtils.toJSONString(userInfo),
-                            userInfoClass
+                                JSONUtils.toJSONString(userInfo),
+                                userInfoClass
                         )
                 );
     }
@@ -69,14 +81,14 @@ public class JWSUserUtils {
     
     public static <T> Optional<T> getPayloadValue(String key, Class<T> valueClass) {
         try {
-            String token = HttpContext.getRequest().getHeader(jwsAuthConfig.getAuthHeader());
+            String token = HttpContext.getRequest().getHeader(authHeader);
             
             if (StringUtils.isBlank(token)) {
-                log.warn("获取的 Token 为空, 认证请求头名称 [{}]", jwsAuthConfig.getAuthHeader());
+                log.warn("获取的 Token 为空, 认证请求头名称 [{}]", authHeader);
                 return Optional.empty();
             }
             
-            Jwt<Header<?>, Claims> jwtContent = JWSUtils.parse(token, jwsAuthConfig.getSecretKey(), 0L);
+            Jwt<Header<?>, Claims> jwtContent = JWSUtils.parse(token, secretKey, 0L);
             T payloadValue = jwtContent.getBody().get(key, valueClass);
             if (payloadValue == null) {
                 log.warn("获取 Payload.key [{}] 的值为空. JWT Payload [{}]",

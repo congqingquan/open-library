@@ -20,7 +20,7 @@ import java.text.MessageFormat;
 import java.util.UUID;
 
 /**
- * 本地存储
+ * Local storage
  *
  * @author Qingquan
  */

@@ -4,31 +4,40 @@
 
     <groupId>org.cqq</groupId>
     <artifactId>open-library</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>${revision}</version>
     <packaging>pom</packaging>
 
     <name>open-library</name>
 
     <modules>
+        <!-- Base modules -->
         <module>open-library-common</module>
+        <module>open-library-web</module>
+        <module>open-library-spring</module>
+        <module>open-library-redis</module>
+        <module>open-library-mybatis</module>
+        <module>open-library-spring-boot-starter</module>
+        <!-- Functional modules -->
+        <module>open-library-sdk</module>
+        <module>open-library-storage</module>
         <module>open-library-trade</module>
         <module>open-library-notification</module>
-        <module>open-library-storage</module>
-        <module>open-library-spring-boot3-starter</module>
     </modules>
 
     <properties>
+        <!-- Base -->
         <java.version>17</java.version>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-
-        <open-library.version>${version}</open-library.version>
-
+        <!-- Global version -->
+        <revision>1.0.0-SNAPSHOT</revision>
+        <!-- Component -->
         <spring-boot.version>3.0.2</spring-boot.version>
         <redission.version>3.28.0</redission.version>
         <mybatis-plus.version>3.5.6</mybatis-plus.version>
+        <aspectj.version>1.9.19</aspectj.version>
         <jwt.version>0.11.5</jwt.version>
         <cglib.version>3.3.0</cglib.version>
         <okhttp.version>4.10.0</okhttp.version>
@@ -37,6 +46,7 @@
         <zxing-javase.version>3.4.1</zxing-javase.version>
         <guava.version>31.0.1-jre</guava.version>
         <lombok.version>1.18.30</lombok.version>
+        <swagger.version>2.2.19</swagger.version>
 
         <wechatpay-apiv3.version>0.2.14</wechatpay-apiv3.version>
         <alipay-sdk-java-v3.version>3.1.15.ALL</alipay-sdk-java-v3.version>
@@ -46,6 +56,96 @@
     
     <dependencyManagement>
         <dependencies>
+            <!-- ============================= Base modules ============================= -->
+            <dependency>
+                <groupId>org.cqq</groupId>
+                <artifactId>open-library-common</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.cqq</groupId>
+                <artifactId>open-library-web</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.cqq</groupId>
+                <artifactId>open-library-spring</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.cqq</groupId>
+                <artifactId>open-library-redis</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.cqq</groupId>
+                <artifactId>open-library-mybatis</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
+            <!-- ============================= Base modules starters ============================= -->
+            <dependency>
+                <groupId>org.cqq</groupId>
+                <artifactId>open-library-common-spring-boot-starter</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.cqq</groupId>
+                <artifactId>open-library-web-spring-boot-starter</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.cqq</groupId>
+                <artifactId>open-library-spring-spring-boot-starter</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.cqq</groupId>
+                <artifactId>open-library-redis-spring-boot-starter</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.cqq</groupId>
+                <artifactId>open-library-mybatis-spring-boot-starter</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
+            <!-- ============================= Functional modules ============================= -->
+            <dependency>
+                <groupId>org.cqq</groupId>
+                <artifactId>open-library-sdk</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.cqq</groupId>
+                <artifactId>open-library-storage</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.cqq</groupId>
+                <artifactId>open-library-notification</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.cqq</groupId>
+                <artifactId>open-library-trade</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
+            <!-- ============================= Functional modules starters ============================= -->
+            <dependency>
+                <groupId>org.cqq</groupId>
+                <artifactId>open-library-storage-spring-boot-starter</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.cqq</groupId>
+                <artifactId>open-library-trade-spring-boot-starter</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
+            <!-- ============================= other ============================= -->
+
             <!-- springboot -->
             <dependency>
                 <groupId>org.springframework.boot</groupId>
@@ -111,6 +211,13 @@
                 <version>${cglib.version}</version>
             </dependency>
 
+            <!-- aop -->
+            <dependency>
+                <groupId>org.aspectj</groupId>
+                <artifactId>aspectjweaver</artifactId>
+                <version>${aspectj.version}</version>
+            </dependency>
+
             <!-- okhttp -->
             <dependency>
                 <groupId>com.squareup.okhttp3</groupId>
@@ -146,7 +253,7 @@
             <dependency>
                 <groupId>io.swagger.core.v3</groupId>
                 <artifactId>swagger-annotations-jakarta</artifactId>
-                <version>2.2.19</version>
+                <version>${swagger.version}</version>
             </dependency>
 
             <!-- lombok -->
@@ -154,35 +261,6 @@
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
                 <version>${lombok.version}</version>
-            </dependency>
-
-            <!-- ============================= modules ============================= -->
-            <dependency>
-                <groupId>org.cqq</groupId>
-                <artifactId>open-library-common</artifactId>
-                <version>${open-library.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.cqq</groupId>
-                <artifactId>open-library-trade</artifactId>
-                <version>${open-library.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.cqq</groupId>
-                <artifactId>open-library-notification</artifactId>
-                <version>${open-library.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.cqq</groupId>
-                <artifactId>open-library-storage</artifactId>
-                <version>${open-library.version}</version>
-            </dependency>
-
-            <!-- ============================= module-starters ============================= -->
-            <dependency>
-                <groupId>org.cqq</groupId>
-                <artifactId>open-library-storage-spring-boot3-starter</artifactId>
-                <version>${open-library.version}</version>
             </dependency>
 
             <!-- ============================= trade ============================= -->
@@ -222,6 +300,37 @@
     </dependencyManagement>
 
     <build>
+        <finalName>${project.artifactId}</finalName>
+        <resources>
+            <resource>
+                <directory>src/main/webapp</directory>
+                <filtering>true</filtering>
+                <excludes>
+                    <exclude>**/*</exclude>
+                </excludes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**/*</include>
+                </includes>
+                <excludes>
+                    <exclude>**/templates/**</exclude>
+                </excludes>
+            </resource>
+            <resource>
+                <directory>src/main/java</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**/*.xml</include>
+                </includes>
+                <excludes>
+                    <exclude>**/*.java</exclude>
+                </excludes>
+            </resource>
+        </resources>
+
         <plugins>
             <!-- compile -->
             <plugin>
@@ -233,10 +342,36 @@
                     <target>${maven.compiler.target}</target>
                     <encoding>${project.build.sourceEncoding}</encoding>
                     <compilerArgs>
-                        <!-- 编译后保留方法形参名称在 Class 中，以便可以反射获取 -->
                         <arg>-parameters</arg>
                     </compilerArgs>
                 </configuration>
+            </plugin>
+
+            <!-- Global version -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>flatten-maven-plugin</artifactId>
+                <version>1.6.0</version>
+                <configuration>
+                    <flattenMode>resolveCiFriendliesOnly</flattenMode>
+                    <updatePomFile>true</updatePomFile>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>flatten</goal>
+                        </goals>
+                        <id>flatten</id>
+                        <phase>process-resources</phase>
+                    </execution>
+                    <execution>
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                        <id>flatten.clean</id>
+                        <phase>clean</phase>
+                    </execution>
+                </executions>
             </plugin>
 
             <!-- sources -->

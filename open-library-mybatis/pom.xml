@@ -1,0 +1,32 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.cqq</groupId>
+        <artifactId>open-library</artifactId>
+        <version>${revision}</version>
+    </parent>
+
+    <artifactId>open-library-mybatis</artifactId>
+    <packaging>jar</packaging>
+
+    <name>open-library-mybatis</name>
+
+    <dependencies>
+        <!-- module -->
+        <dependency>
+            <groupId>org.cqq</groupId>
+            <artifactId>open-library-common</artifactId>
+        </dependency>
+
+        <!-- mybatis -->
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-extension</artifactId>
+        </dependency>
+    </dependencies>
+</project>

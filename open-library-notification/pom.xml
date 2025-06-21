@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.cqq</groupId>
         <artifactId>open-library</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>${revision}</version>
     </parent>
 
     <artifactId>open-library-notification</artifactId>
@@ -18,6 +18,18 @@
         <dependency>
             <groupId>org.cqq</groupId>
             <artifactId>open-library-common</artifactId>
+        </dependency>
+
+        <!-- spring -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-autoconfigure</artifactId>
+        </dependency>
+        <!-- Generate spring-configuration-metadata.json -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
         </dependency>
 
         <!-- notification sdk -->

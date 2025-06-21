@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 存储接口
+ * Storage
  *
  * @author Qingquan
  */

@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.cqq</groupId>
         <artifactId>open-library</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>${revision}</version>
     </parent>
 
     <artifactId>open-library-storage</artifactId>
@@ -17,6 +17,10 @@
         <dependency>
             <groupId>org.cqq</groupId>
             <artifactId>open-library-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.cqq</groupId>
+            <artifactId>open-library-mybatis</artifactId>
         </dependency>
     </dependencies>
 </project>

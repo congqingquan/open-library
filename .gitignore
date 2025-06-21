@@ -51,3 +51,6 @@ rebel.xml
 
 # Ignore maven file
 .mvn
+
+# Ignore flattened pom
+.flattened-pom.xml

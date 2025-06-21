@@ -7,7 +7,7 @@ import org.cqq.openlibrary.common.exception.ExceptionROption;
  *
  * @author Qingquan
  */
-public class NetworkException extends RuntimeException {
+public class NetworkException extends ServerException {
     
     public NetworkException() {
     }

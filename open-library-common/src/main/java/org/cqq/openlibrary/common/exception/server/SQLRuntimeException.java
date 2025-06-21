@@ -7,7 +7,7 @@ import org.cqq.openlibrary.common.exception.ExceptionROption;
  *
  * @author Qingquan
  */
-public class SQLRuntimeException extends RuntimeException {
+public class SQLRuntimeException extends ServerException {
     
     public SQLRuntimeException() {
     }

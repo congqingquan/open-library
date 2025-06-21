@@ -7,7 +7,7 @@ import org.cqq.openlibrary.common.exception.ExceptionROption;
  *
  * @author Qingquan
  */
-public class ReflectionRuntimeException extends RuntimeException {
+public class ReflectionRuntimeException extends ServerException {
     
     public ReflectionRuntimeException() {
     }

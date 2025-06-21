@@ -30,7 +30,7 @@ public enum ExceptionROption implements ROption {
     BIZ_EXCEPTION(ExceptionTypeEnum.BUSINESS, 3_0000_0000L, "业务异常"),
     BIZ_WECHAT_EXCEPTION(ExceptionTypeEnum.BUSINESS, 3_0001_0000L, "微信异常"),
     BIZ_ALIPAY_EXCEPTION(ExceptionTypeEnum.BUSINESS, 3_0002_0000L, "支付宝异常"),
-    BIZ_ALI_YUN_EXCEPTION(ExceptionTypeEnum.BUSINESS, 3_0003_0000L, "阿里云异常")
+    BIZ_ALI_CLOUD_EXCEPTION(ExceptionTypeEnum.BUSINESS, 3_0003_0000L, "阿里云异常")
     ;
     
     

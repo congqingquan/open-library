@@ -13,9 +13,8 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 import org.cqq.openlibrary.common.exception.server.NetworkException;
-import org.cqq.openlibrary.common.exception.biz.WechatException;
+import org.cqq.openlibrary.common.exception.server.OkHttpResponseException;
 import org.cqq.openlibrary.common.func.checked.CheckedFunction;
-import org.cqq.openlibrary.common.sdk.wechat.response.base.WechatResponse;
 
 import java.util.HashMap;
 import java.util.List;
@@ -72,19 +71,19 @@ public class OkHttpUtils {
         }
     }
     
-    public static <R extends WechatResponse<R>> R consumeResponseBody(Response response, String apiDesc,
-                                                                    CheckedFunction<ResponseBody, R, ?> responseBodyMapper) {
+    public static <R, X extends Throwable> R consumeResponseBody(Response response, String apiDesc,
+                                                                 CheckedFunction<ResponseBody, R, ?> responseBodyMapper) {
         try (response) {
             ResponseBody body = response.body();
             if (body == null) {
-                throw new WechatException("The response body of " + apiDesc + " API is null");
+                throw new OkHttpResponseException("The response body of " + apiDesc + " API is null");
             }
             if (!response.isSuccessful()) {
-                throw new WechatException(apiDesc + " API response isn't successful: " + response);
+                throw new OkHttpResponseException(apiDesc + " API response isn't successful: " + response);
             }
             return responseBodyMapper.apply(body);
         } catch (Throwable throwable) {
-            throw new WechatException("Call " + apiDesc + " API failed", throwable);
+            throw new OkHttpResponseException("Call " + apiDesc + " API failed" + response);
         }
     }
     

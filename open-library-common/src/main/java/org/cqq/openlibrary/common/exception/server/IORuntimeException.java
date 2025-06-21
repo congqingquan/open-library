@@ -7,7 +7,7 @@ import org.cqq.openlibrary.common.exception.ExceptionROption;
  *
  * @author Qingquan
  */
-public class IORuntimeException extends RuntimeException {
+public class IORuntimeException extends ServerException {
     
     public IORuntimeException() {
     }
