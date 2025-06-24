@@ -110,31 +110,31 @@ public interface IServiceExt<T> extends IService<T> {
     
     // ================================ update ================================
     
-    Integer update(SFunction<T, ?> eqc1, Object eqv1,
+    boolean update(SFunction<T, ?> eqc1, Object eqv1,
                    SFunction<T, ?> setC, Object setV);
     
-    Integer update(SFunction<T, ?> eqc1, Object eqv1,
+    boolean update(SFunction<T, ?> eqc1, Object eqv1,
                    SFunction<T, ?> eqc2, Object eqv2,
                    SFunction<T, ?> setC, Object setV);
     
-    Integer update(SFunction<T, ?> eqc1, Object eqv1,
+    boolean update(SFunction<T, ?> eqc1, Object eqv1,
                    SFunction<T, ?> eqc2, Object eqv2,
                    SFunction<T, ?> eqc3, Object eqv3,
                    SFunction<T, ?> setC, Object setV);
     
-    Integer updateIn(SFunction<T, ?> inc1, Collection<?> inv1,
+    boolean updateIn(SFunction<T, ?> inc1, Collection<?> inv1,
                      SFunction<T, ?> setC, Object setV);
     
     // ================================ remove ================================
     
-    Integer remove(SFunction<T, ?> c1, Object v1);
+    boolean remove(SFunction<T, ?> c1, Object v1);
     
-    Integer remove(SFunction<T, ?> c1, Object v1,
+    boolean remove(SFunction<T, ?> c1, Object v1,
                    SFunction<T, ?> c2, Object v2);
     
-    Integer remove(SFunction<T, ?> c1, Object v1,
+    boolean remove(SFunction<T, ?> c1, Object v1,
                    SFunction<T, ?> c2, Object v2,
                    SFunction<T, ?> c3, Object v3);
     
-    Integer removeIn(SFunction<T, ?> inc1, Collection<?> inv1);
+    boolean removeIn(SFunction<T, ?> inc1, Collection<?> inv1);
 }

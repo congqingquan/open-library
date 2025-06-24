@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * 性别枚举
+ * Gender enum
  *
  * @author Qingquan
  */

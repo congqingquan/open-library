@@ -156,52 +156,52 @@ public abstract class ServiceImplExt<M extends BaseMapperExt<T>, T> extends Serv
     }
     
     @Override
-    public Integer update(SFunction<T, ?> eqc1, Object eqv1,
+    public boolean update(SFunction<T, ?> eqc1, Object eqv1,
                           SFunction<T, ?> setC, Object setV) {
-        return super.baseMapper.update(eqc1, eqv1, setC, setV);
+        return super.baseMapper.update(eqc1, eqv1, setC, setV) > 0;
     }
     
     @Override
-    public Integer update(SFunction<T, ?> eqc1, Object eqv1,
+    public boolean update(SFunction<T, ?> eqc1, Object eqv1,
                           SFunction<T, ?> eqc2, Object eqv2,
                           SFunction<T, ?> setC, Object setV) {
-        return super.baseMapper.update(eqc1, eqv1, eqc2, eqv2, setC, setV);
+        return super.baseMapper.update(eqc1, eqv1, eqc2, eqv2, setC, setV) > 0;
     }
     
     @Override
-    public Integer update(SFunction<T, ?> eqc1, Object eqv1,
+    public boolean update(SFunction<T, ?> eqc1, Object eqv1,
                           SFunction<T, ?> eqc2, Object eqv2,
                           SFunction<T, ?> eqc3, Object eqv3,
                           SFunction<T, ?> setC, Object setV) {
-        return super.baseMapper.update(eqc1, eqv1, eqc2, eqv2, eqc3, eqv3, setC, setV);
+        return super.baseMapper.update(eqc1, eqv1, eqc2, eqv2, eqc3, eqv3, setC, setV) > 0;
     }
     
     @Override
-    public Integer updateIn(SFunction<T, ?> inc1, Collection<?> inv1,
+    public boolean updateIn(SFunction<T, ?> inc1, Collection<?> inv1,
                             SFunction<T, ?> setC, Object setV) {
-        return super.baseMapper.updateIn(inc1, inv1, setC, setV);
+        return super.baseMapper.updateIn(inc1, inv1, setC, setV) > 0;
     }
     
     @Override
-    public Integer remove(SFunction<T, ?> c1, Object v1) {
-        return super.baseMapper.delete(c1, v1);
+    public boolean remove(SFunction<T, ?> c1, Object v1) {
+        return super.baseMapper.delete(c1, v1) > 0;
     }
     
     @Override
-    public Integer remove(SFunction<T, ?> c1, Object v1,
+    public boolean remove(SFunction<T, ?> c1, Object v1,
                           SFunction<T, ?> c2, Object v2) {
-        return super.baseMapper.delete(c1, v1, c2, v2);
+        return super.baseMapper.delete(c1, v1, c2, v2) > 0;
     }
     
     @Override
-    public Integer remove(SFunction<T, ?> c1, Object v1,
+    public boolean remove(SFunction<T, ?> c1, Object v1,
                           SFunction<T, ?> c2, Object v2,
                           SFunction<T, ?> c3, Object v3) {
-        return super.baseMapper.delete(c1, v1, c2, v2, c3, v3);
+        return super.baseMapper.delete(c1, v1, c2, v2, c3, v3) > 0;
     }
     
     @Override
-    public Integer removeIn(SFunction<T, ?> inc1, Collection<?> inv1) {
-        return super.baseMapper.deleteIn(inc1, inv1);
+    public boolean removeIn(SFunction<T, ?> inc1, Collection<?> inv1) {
+        return super.baseMapper.deleteIn(inc1, inv1) > 0;
     }
 }

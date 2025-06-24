@@ -1,9 +1,12 @@
 package org.cqq.openlibrary.common.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * String utils
@@ -83,6 +86,10 @@ public class StringUtils {
             }
         }
         return result;
+    }
+    
+    public static String join(String delimiter, Predicate<CharSequence> filter, CharSequence...  elements) {
+        return Arrays.stream(elements).filter(filter).collect(Collectors.joining(delimiter));
     }
     
     public static String firstLetterToLowerCase(String str) {

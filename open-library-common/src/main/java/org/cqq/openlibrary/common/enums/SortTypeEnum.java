@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * 排序类型枚举
+ * Sort type enum
  *
  * @author Qingquan
  */

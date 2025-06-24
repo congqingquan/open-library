@@ -4,16 +4,17 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * 用户类型枚举
+ * Register method enum
  *
  * @author Qingquan
  */
 @Getter
 @AllArgsConstructor
-public enum UserTypeEnum {
+public enum RegisterMethodEnum {
 
     MINI_PROGRAM_WECHAT,
     MINI_PROGRAM_ALIPAY,
     APP,
+    H5,
     PC
 }

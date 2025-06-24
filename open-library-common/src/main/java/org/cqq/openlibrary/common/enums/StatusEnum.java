@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * 状态枚举
+ * Status enum
  *
  * @author Qingquan
  */
