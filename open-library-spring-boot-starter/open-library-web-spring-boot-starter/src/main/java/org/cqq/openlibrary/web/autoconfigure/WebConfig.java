@@ -3,29 +3,13 @@ package org.cqq.openlibrary.web.autoconfigure;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Getter;
-import org.cqq.openlibrary.web.jackson.deserializer.StringToLocalDateDeserializer;
-import org.cqq.openlibrary.web.jackson.deserializer.StringToLocalDateTimeDeserializer;
-import org.cqq.openlibrary.web.jackson.deserializer.StringToLocalTimeDeserializer;
-import org.cqq.openlibrary.web.jackson.serializer.BoxingLongArrayToStringArraySerializer;
-import org.cqq.openlibrary.web.jackson.serializer.LocalDateTimeToStringSerializer;
-import org.cqq.openlibrary.web.jackson.serializer.LocalDateToStringSerializer;
-import org.cqq.openlibrary.web.jackson.serializer.LocalTimeToStringSerializer;
-import org.cqq.openlibrary.web.jackson.serializer.PrimitiveLongArrayToStringArraySerializer;
-import org.cqq.openlibrary.web.jackson.serializer.Scale2BigDecimalToStringSerializer;
+import org.cqq.openlibrary.common.enums.DeserializerTypeEnum;
+import org.cqq.openlibrary.common.enums.SerializerTypeEnum;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.Collection;
 
 /**
@@ -93,44 +77,6 @@ public class WebConfig {
         private Collection<SerializationFeature>   disableSerializationFeatures;
         private Collection<DeserializationFeature> disableDeserializationFeatures;
         private Collection<MapperFeature>          disableMapperFeatures;
-        
-        @Getter
-        @AllArgsConstructor
-        public enum SerializerTypeEnum {
-            
-            // Long
-            PRIMITIVE_LONG_TO_STRING(Long.TYPE, ToStringSerializer.instance),
-            BOXING_LONG_TO_STRING(Long.class, ToStringSerializer.instance),
-            PRIMITIVE_LONG_ARRAY_TO_STRING_ARRAY(long[].class, PrimitiveLongArrayToStringArraySerializer.instance),
-            BOXING_LONG_ARRAY_TO_STRING_ARRAY(Long[].class, BoxingLongArrayToStringArraySerializer.instance),
-            
-            // Datetime
-            LOCAL_TIME_TO_STRING(LocalTime.class, LocalTimeToStringSerializer.instance),
-            LOCAL_DATE_TO_STRING(LocalDate.class, LocalDateToStringSerializer.instance),
-            LOCAL_DATE_TIME_TO_STRING(LocalDateTime.class, LocalDateTimeToStringSerializer.instance),
-            
-            // BigDecimal
-            SCALE2_BIG_DECIMAL_TO_STRING(BigDecimal.class, Scale2BigDecimalToStringSerializer.instance),
-            ;
-            
-            private final Class<?> type;
-            
-            private final JsonSerializer<?> serializer;
-        }
-        
-        @Getter
-        @AllArgsConstructor
-        public enum DeserializerTypeEnum {
-            // Datetime
-            STRING_TO_LOCAL_TIME(LocalTime.class, StringToLocalTimeDeserializer.instance),
-            STRING_TO_LOCAL_DATE(LocalDate.class, StringToLocalDateDeserializer.instance),
-            STRING_TO_LOCAL_DATE_TIME(LocalDateTime.class, StringToLocalDateTimeDeserializer.instance),
-            ;
-            
-            private final Class<?> type;
-            
-            private final JsonDeserializer<?> deserializer;
-        }
     }
     
     // ========================================== Filter ==========================================

@@ -1,4 +1,4 @@
-package org.cqq.openlibrary.web.jackson.serializer;
+package org.cqq.openlibrary.common.jackson.serializer;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
@@ -6,19 +6,19 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import org.cqq.openlibrary.common.util.CollectionUtils;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Collection;
 
 /**
- * {@literal Serializer: List<Long> > String[]}
+ * {@literal Serializer: Collection<Long> > String[]}
  *
  * @author Qingquan
  */
-public class LongListSerializer extends JsonSerializer<List<Long>> {
+public class LongCollectionSerializer extends JsonSerializer<Collection<Long>> {
     
-    public static final LongListSerializer instance = new LongListSerializer();
+    public static final LongCollectionSerializer instance = new LongCollectionSerializer();
     
     @Override
-    public void serialize(List<Long> values, JsonGenerator generator, SerializerProvider serializers) throws IOException {
+    public void serialize(Collection<Long> values, JsonGenerator generator, SerializerProvider serializers) throws IOException {
         if (CollectionUtils.isEmpty(values)) {
             generator.writeNull();
             return;

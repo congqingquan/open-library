@@ -1,4 +1,5 @@
-package org.cqq.openlibrary.web.jackson.serializer;
+package org.cqq.openlibrary.common.jackson.serializer;
+
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
@@ -6,23 +7,23 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import org.cqq.openlibrary.common.constants.Constants;
 
 import java.io.IOException;
-import java.time.LocalTime;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
 /**
- * Serializer: LocalTime > String(HH_mm_ss)
+ * Serializer: LocalDate > String(yyyy_MM_dd)
  *
  * @author Qingquan
  */
-public class LocalTimeToStringSerializer extends JsonSerializer<LocalTime> {
+public class LocalDateToStringSerializer extends JsonSerializer<LocalDate> {
 
-    public static final LocalTimeToStringSerializer instance = new LocalTimeToStringSerializer();
+    public static final LocalDateToStringSerializer instance = new LocalDateToStringSerializer();
 
-    private final static String PATTERN = Constants.HH_mm_ss;
+    private final static String PATTERN = Constants.yyyy_MM_dd;
 
     @Override
-    public void serialize(LocalTime value, JsonGenerator generator, SerializerProvider serializerProvider) throws IOException {
+    public void serialize(LocalDate value, JsonGenerator generator, SerializerProvider serializerProvider) throws IOException {
         if (Objects.isNull(value)) {
             generator.writeNull();
             return;
@@ -31,7 +32,7 @@ public class LocalTimeToStringSerializer extends JsonSerializer<LocalTime> {
     }
 
     @Override
-    public Class<LocalTime> handledType() {
-        return LocalTime.class;
+    public Class<LocalDate> handledType() {
+        return LocalDate.class;
     }
 }

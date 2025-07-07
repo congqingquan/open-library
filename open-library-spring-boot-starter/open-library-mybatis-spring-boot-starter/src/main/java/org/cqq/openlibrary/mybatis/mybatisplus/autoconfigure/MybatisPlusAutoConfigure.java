@@ -22,8 +22,7 @@ import org.springframework.context.annotation.Configuration;
 public class MybatisPlusAutoConfigure {
     
     @ConditionalOnProperties(properties = {
-            @ConditionalOnProperties.Property(name = "open-library.mybatis.mybatis-plus.tenant-id-column"),
-            @ConditionalOnProperties.Property(name = "open-library.mybatis.mybatis-plus.tenant-id-http-header"),
+            @ConditionalOnProperties.Property(name = "open-library.mybatis.mybatis-plus.tenant-config.tenant-id-column")
     })
     @Bean
     public MybatisPlusInterceptor pluginInterceptor(MybatisPlusConfig mybatisPlusConfig) {

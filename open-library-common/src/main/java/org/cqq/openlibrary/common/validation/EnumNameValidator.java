@@ -47,7 +47,7 @@ public class EnumNameValidator implements ConstraintValidator<ValidEnumName, Obj
         Collection<String> stringValues = getStrings(value);
         
         // required check
-        if (stringValues.isEmpty()) {
+        if (stringValues.isEmpty() || stringValues.stream().allMatch(String::isEmpty)) {
             return constraintAnnotation.skipIfNullOrEmpty();
         }
         

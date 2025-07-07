@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import lombok.extern.slf4j.Slf4j;
+import org.cqq.openlibrary.common.enums.DeserializerTypeEnum;
+import org.cqq.openlibrary.common.enums.SerializerTypeEnum;
 import org.cqq.openlibrary.common.util.CollectionUtils;
 import org.cqq.openlibrary.common.util.ReflectionUtils;
 import org.cqq.openlibrary.spring.autoconfigure.condition.ConditionalOnProperties;
@@ -90,12 +92,12 @@ public class WebAutoConfigure {
             }
 
             // 1. 序列化: 应用到 -> 注入的 ObjectMapper.writeValueAsString & SpringMVC 处理接口出参
-            Collection<WebConfig.JacksonConfig.SerializerTypeEnum> serializers = jacksonConfig.getSerializers();
+            Collection<SerializerTypeEnum> serializers = jacksonConfig.getSerializers();
             if (CollectionUtils.isNotEmpty(serializers)) {
                 serializers.forEach(serializer -> builder.serializerByType(serializer.getType(), serializer.getSerializer()));
             }
             // 2. 反序列化: 应用到 -> 注入的 ObjectMapper.readValue
-            Collection<WebConfig.JacksonConfig.DeserializerTypeEnum> deserializers = jacksonConfig.getDeserializers();
+            Collection<DeserializerTypeEnum> deserializers = jacksonConfig.getDeserializers();
             if (CollectionUtils.isNotEmpty(deserializers)) {
                 deserializers.forEach(deserializer -> builder.deserializerByType(deserializer.getType(), deserializer.getDeserializer()));
             }

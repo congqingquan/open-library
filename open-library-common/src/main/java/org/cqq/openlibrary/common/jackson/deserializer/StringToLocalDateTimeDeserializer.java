@@ -1,4 +1,4 @@
-package org.cqq.openlibrary.web.jackson.deserializer;
+package org.cqq.openlibrary.common.jackson.deserializer;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;

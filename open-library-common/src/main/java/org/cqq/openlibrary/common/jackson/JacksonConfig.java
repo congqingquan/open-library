@@ -1,17 +1,17 @@
-package org.cqq.openlibrary.web.jackson;
+package org.cqq.openlibrary.common.jackson;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-import org.cqq.openlibrary.web.jackson.deserializer.StringToLocalDateDeserializer;
-import org.cqq.openlibrary.web.jackson.deserializer.StringToLocalDateTimeDeserializer;
-import org.cqq.openlibrary.web.jackson.deserializer.StringToLocalTimeDeserializer;
-import org.cqq.openlibrary.web.jackson.serializer.Scale2BigDecimalToStringSerializer;
-import org.cqq.openlibrary.web.jackson.serializer.LocalDateToStringSerializer;
-import org.cqq.openlibrary.web.jackson.serializer.LocalDateTimeToStringSerializer;
-import org.cqq.openlibrary.web.jackson.serializer.LocalTimeToStringSerializer;
-import org.cqq.openlibrary.web.jackson.serializer.BoxingLongArrayToStringArraySerializer;
-import org.cqq.openlibrary.web.jackson.serializer.PrimitiveLongArrayToStringArraySerializer;
+import org.cqq.openlibrary.common.jackson.deserializer.StringToLocalDateDeserializer;
+import org.cqq.openlibrary.common.jackson.deserializer.StringToLocalDateTimeDeserializer;
+import org.cqq.openlibrary.common.jackson.deserializer.StringToLocalTimeDeserializer;
+import org.cqq.openlibrary.common.jackson.serializer.BoxingLongArrayToStringArraySerializer;
+import org.cqq.openlibrary.common.jackson.serializer.LocalDateTimeToStringSerializer;
+import org.cqq.openlibrary.common.jackson.serializer.LocalDateToStringSerializer;
+import org.cqq.openlibrary.common.jackson.serializer.LocalTimeToStringSerializer;
+import org.cqq.openlibrary.common.jackson.serializer.PrimitiveLongArrayToStringArraySerializer;
+import org.cqq.openlibrary.common.jackson.serializer.Scale2BigDecimalToStringSerializer;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
