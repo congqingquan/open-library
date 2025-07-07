@@ -10,13 +10,13 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 /**
- * Tenant interceptor
+ * Mybatis plus tenant interceptor
  *
  * @author Qingquan
  */
 @Data
 @AllArgsConstructor
-public class TenantInterceptor implements HandlerInterceptor {
+public class MybatisPlusTenantInterceptor implements HandlerInterceptor {
     
     private final String tenantIdHttpHeader;
     

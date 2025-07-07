@@ -29,6 +29,8 @@ public class WebConfig {
     
     private FilterConfig filterConfig;
     
+    private InterceptorConfig interceptorConfig;
+    
     // ========================================== Log ==========================================
     
     @Data
@@ -109,6 +111,21 @@ public class WebConfig {
             private Collection<String> urlPatterns;
             private Integer order;
             private Class<? extends org.cqq.openlibrary.web.filter.RepeatableReadFilter.WrapPredicate> wrapPredicate;
+        }
+    }
+    
+    // ========================================== Interceptor ==========================================
+    
+    @Data
+    public static class InterceptorConfig {
+        
+        private MybatisPlusTenantInterceptorConfig mybatisPlusTenantInterceptorConfig;
+        
+        @Data
+        public static class MybatisPlusTenantInterceptorConfig {
+            private Collection<String> urlPatterns;
+            private Integer order;
+            private String tenantIdHttpHeader;
         }
     }
 }

@@ -21,8 +21,6 @@ public class MybatisPlusConfig {
         
         private String tenantIdColumn;
         
-        private String tenantIdHttpHeader;
-        
         private List<String> ignoreTables;
     }
 }

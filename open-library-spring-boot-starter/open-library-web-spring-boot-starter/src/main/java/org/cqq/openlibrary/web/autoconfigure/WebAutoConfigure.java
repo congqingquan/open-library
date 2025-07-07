@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.cqq.openlibrary.common.enums.DeserializerTypeEnum;
 import org.cqq.openlibrary.common.enums.SerializerTypeEnum;
@@ -15,6 +16,7 @@ import org.cqq.openlibrary.web.exception.ExceptionHandler;
 import org.cqq.openlibrary.web.filter.CrossDomainFilter;
 import org.cqq.openlibrary.web.filter.EncodingFilter;
 import org.cqq.openlibrary.web.filter.RepeatableReadFilter;
+import org.cqq.openlibrary.web.interceptor.MybatisPlusTenantInterceptor;
 import org.cqq.openlibrary.web.log.WebLogAdvisor;
 import org.springframework.aop.Advisor;
 import org.springframework.aop.aspectj.AspectJExpressionPointcut;
@@ -27,9 +29,13 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Optional;
 
 /**
  * Web autoconfigure
@@ -85,12 +91,12 @@ public class WebAutoConfigure {
     @Bean
     public Jackson2ObjectMapperBuilderCustomizer jackson2ObjectMapperBuilderCustomizer(WebConfig webConfig) {
         return builder -> {
-
+            
             WebConfig.JacksonConfig jacksonConfig = webConfig.getJacksonConfig();
             if (jacksonConfig == null) {
                 return;
             }
-
+            
             // 1. 序列化: 应用到 -> 注入的 ObjectMapper.writeValueAsString & SpringMVC 处理接口出参
             Collection<SerializerTypeEnum> serializers = jacksonConfig.getSerializers();
             if (CollectionUtils.isNotEmpty(serializers)) {
@@ -101,7 +107,7 @@ public class WebAutoConfigure {
             if (CollectionUtils.isNotEmpty(deserializers)) {
                 deserializers.forEach(deserializer -> builder.deserializerByType(deserializer.getType(), deserializer.getDeserializer()));
             }
-
+            
             // 3. 特性配置
             // enable features
             Collection<JsonParser.Feature> enableJsonParserFeatures = jacksonConfig.getEnableJsonParserFeatures();
@@ -172,10 +178,10 @@ public class WebAutoConfigure {
     }
     
     @ConditionalOnProperties(properties = {
-           @ConditionalOnProperties.Property(name = "open-library.web.filter-config.cross-domain-filter-config.name"),
-           @ConditionalOnProperties.Property(name = "open-library.web.filter-config.cross-domain-filter-config.url-patterns[0]"),
-           @ConditionalOnProperties.Property(name = "open-library.web.filter-config.cross-domain-filter-config.order"),
-           @ConditionalOnProperties.Property(name = "open-library.web.filter-config.cross-domain-filter-config.post-constructor"),
+            @ConditionalOnProperties.Property(name = "open-library.web.filter-config.cross-domain-filter-config.name"),
+            @ConditionalOnProperties.Property(name = "open-library.web.filter-config.cross-domain-filter-config.url-patterns[0]"),
+            @ConditionalOnProperties.Property(name = "open-library.web.filter-config.cross-domain-filter-config.order"),
+            @ConditionalOnProperties.Property(name = "open-library.web.filter-config.cross-domain-filter-config.post-constructor"),
     })
     @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
     @Bean
@@ -211,5 +217,40 @@ public class WebAutoConfigure {
         filterBean.setUrlPatterns(filterConfig.getUrlPatterns());
         filterBean.setOrder(filterConfig.getOrder());
         return filterBean;
+    }
+    
+    // ======================================== Interceptor ========================================
+    
+    @ConditionalOnProperties(properties = {
+            @ConditionalOnProperties.Property(
+                    name = "open-library.web.interceptor-config.mybatis-plus-tenant-interceptor-config.tenant-id-http-header"
+            ),
+            @ConditionalOnProperties.Property(
+                    name = "open-library.web.interceptor-config.mybatis-plus-tenant-interceptor-config.url-patterns"
+            )
+    })
+    @Configuration
+    @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
+    @AllArgsConstructor
+    public static class WebApplicationConfig implements WebMvcConfigurer {
+        
+        private final WebConfig webConfig;
+        
+        @Bean
+        public MybatisPlusTenantInterceptor mybatisPlusTenantInterceptor(WebConfig webConfig) {
+            return new MybatisPlusTenantInterceptor(
+                    webConfig.getInterceptorConfig().getMybatisPlusTenantInterceptorConfig().getTenantIdHttpHeader()
+            );
+        }
+        
+        @Override
+        public void addInterceptors(InterceptorRegistry registry) {
+            WebConfig.InterceptorConfig.MybatisPlusTenantInterceptorConfig mybatisPlusTenantInterceptorConfig =
+                    webConfig.getInterceptorConfig().getMybatisPlusTenantInterceptorConfig();
+            
+            registry.addInterceptor(mybatisPlusTenantInterceptor(webConfig))
+                    .order(Optional.ofNullable(mybatisPlusTenantInterceptorConfig.getOrder()).orElse(0))
+                    .addPathPatterns(new ArrayList<>(mybatisPlusTenantInterceptorConfig.getUrlPatterns()));
+        }
     }
 }
