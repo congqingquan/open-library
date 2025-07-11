@@ -4,8 +4,10 @@ import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.cqq.openlibrary.common.domain.Pair;
 
 import java.lang.annotation.ElementType;
+import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
@@ -18,6 +20,7 @@ import java.util.function.Function;
  *
  * @author Qingquan
  */
+@Repeatable(DependsOnList.class)
 @Target({ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = DependsOnValidator.class)
@@ -39,6 +42,8 @@ public @interface DependsOn {
     
     CheckingMethod checkingMethod();
     
+    String checkingRegex() default "";
+    
     @Getter
     @AllArgsConstructor
     enum CheckingMethod {
@@ -56,7 +61,15 @@ public @interface DependsOn {
             } else {
                 return value != null;
             }
-        });
+        }),
+        @SuppressWarnings("unchecked")
+        REGEX(pair -> {
+            Pair<String, Object> regexAndValue = (Pair<String, Object>) pair;
+            String regex = regexAndValue.getKey();
+            Object value = regexAndValue.getValue();
+            return value != null && value.toString().matches(regex);
+        })
+        ;
         
         private final Function<Object, Boolean> validFn;
     }

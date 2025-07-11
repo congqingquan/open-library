@@ -15,16 +15,16 @@ import java.util.stream.Collectors;
  *
  * @author Qingquan
  */
-public class EnumNameValidator implements ConstraintValidator<ValidEnumName, Object> {
+public class EnumNameValidator implements ConstraintValidator<EnumName, Object> {
     
-    private ValidEnumName constraintAnnotation;
+    private EnumName constraintAnnotation;
     
     private Set<Enum<?>> appliedEnumConstants;
     
     private Set<Enum<?>> excludedEnumConstants;
     
     @Override
-    public void initialize(ValidEnumName constraintAnnotation) {
+    public void initialize(EnumName constraintAnnotation) {
         this.constraintAnnotation = constraintAnnotation;
         
         Class<? extends Enum<?>> enumClass = constraintAnnotation.enumClass();

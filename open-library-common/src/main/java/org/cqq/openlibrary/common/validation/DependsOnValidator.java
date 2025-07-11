@@ -3,6 +3,7 @@ package org.cqq.openlibrary.common.validation;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
+import org.cqq.openlibrary.common.domain.Pair;
 import org.cqq.openlibrary.common.util.HttpContext;
 import org.cqq.openlibrary.common.util.JSONUtils;
 import org.cqq.openlibrary.common.util.StringUtils;
@@ -15,16 +16,16 @@ import org.cqq.openlibrary.common.util.StringUtils;
 public class DependsOnValidator implements ConstraintValidator<DependsOn, Object> {
     
     private DependsOn constraintAnnotation;
-
+    
     @Override
     public void initialize(DependsOn constraintAnnotation) {
         this.constraintAnnotation = constraintAnnotation;
     }
-
+    
     @Override
     public boolean isValid(Object value, ConstraintValidatorContext context) {
         
-        if (!constraintAnnotation.triggerValue().equals(value)) {
+        if (!constraintAnnotation.triggerValue().equals(value.toString())) {
             return true;
         }
         
@@ -45,6 +46,20 @@ public class DependsOnValidator implements ConstraintValidator<DependsOn, Object
         }
         
         // Check
-        return constraintAnnotation.checkingMethod().getValidFn().apply(dependentFieldValue);
+        DependsOn.CheckingMethod checkingMethod = constraintAnnotation.checkingMethod();
+        if (DependsOn.CheckingMethod.REGEX == checkingMethod) {
+            String checkingRegex = constraintAnnotation.checkingRegex();
+            if (StringUtils.isEmpty(checkingRegex)) {
+                throw new IllegalArgumentException("Checking regex is empty");
+            }
+            return checkingMethod.getValidFn().apply(
+                    Pair.of(
+                            constraintAnnotation.checkingRegex(),
+                            dependentFieldValue
+                    )
+            );
+        } else {
+            return checkingMethod.getValidFn().apply(dependentFieldValue);
+        }
     }
 }

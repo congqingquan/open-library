@@ -9,14 +9,14 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Valid enum name validation annotation
+ * Enum name validation annotation
  *
  * @author Qingquan
  */
 @Target({ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = EnumNameValidator.class)
-public @interface ValidEnumName {
+public @interface EnumName {
     
     // ============================================== JSR-303/JSR-380 constraint fields ==============================================
     
@@ -36,5 +36,5 @@ public @interface ValidEnumName {
     
     String splitRegex() default "";
     
-    boolean skipIfNullOrEmpty() default true;
+    boolean skipIfNullOrEmpty() default false;
 }
